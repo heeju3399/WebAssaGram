@@ -1,0 +1,371 @@
+import 'dart:convert';
+import 'dart:typed_data';
+import 'package:dio/dio.dart';
+import 'package:dio/dio.dart' as _dio;
+import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
+import 'package:path/path.dart';
+import 'package:async/async.dart';
+import 'package:flutter/material.dart';
+import 'package:mime/mime.dart' as mime;
+
+
+class ImageUpload extends StatefulWidget {
+  const ImageUpload({Key? key}) : super(key: key);
+
+  @override
+  _ImageUploadState createState() => _ImageUploadState();
+}
+
+class _ImageUploadState extends State<ImageUpload> {
+  late XFile _image;
+  final picker = ImagePicker();
+  String url = 'http://172.30.1.19:3000';
+
+
+  void ss(){
+
+  }
+
+  Future<void> getImage() async {
+    //XFile pickedFile = await picker.getImage(source: ImageSource.gallery);
+    XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    setState(() {
+      if (pickedFile != null) {
+        _image = pickedFile;
+      } else {
+        print('No image selected.');
+      }
+    });
+  }
+
+  // upload(XFile imageFile) async {
+  //   // open a bytestream
+  //   var stream = http.ByteStream(DelegatingStream.typed(imageFile.openRead()));
+  //   // get file length
+  //   var length = await imageFile.length();
+  //   // string to uri
+  //   var uri = Uri.parse(url + '/uploads');
+  //   // create multipart request
+  //   var request = http.MultipartRequest("POST", uri);
+  //   // multipart that takes file
+  //   List<http.MultipartFile> sss = [];
+  //   var multipartFile = http.MultipartFile('myFile', stream, length, filename: basename(imageFile.path));
+  //
+  //
+  //
+  //   sss.add(multipartFile);
+  //
+  //
+  //
+  //   request.files.add(multipartFile);
+  //   // send
+  //   var response = await request.send();
+  //   print(response.statusCode);
+  //   // listen for response
+  //   response.stream.transform(utf8.decoder).listen((value) {
+  //     print('이건뭦? ${value.length}');
+  //     print(value);
+  //   });
+  // }
+
+  // void uploadFileAsFormData(File file) async {
+  //   try {
+  //     var uri = Uri.parse(url + '/uploads');
+  //     var request = http.MultipartRequest('POST', uri);
+  //     request.files.add(await http.MultipartFile.fromPath('myFile', file.path));
+  //
+  //     var res = await request.send();
+  //     print(res);
+  //   } catch (err) {
+  //     print('upload err $err');
+  //   }
+  // }
+
+  upload(XFile imageFile) async {
+    print('uplod pass');
+
+    final mimeType = mime.lookupMimeType(imageFile.path, headerBytes: [0xFF, 0xD8])?.split('/');
+    var stream = http.ByteStream(imageFile.openRead());
+    var length = await imageFile.length();
+
+    FormData formData = FormData.fromMap(
+      {
+        "image": http.MultipartFile('myFile', stream, length, filename: basename(imageFile.path)),
+        "data": jsonEncode({
+          "title": '타이틀',
+          "summary": '요약',
+          "content": '내용',
+          "type": '$mimeType',
+        }),
+      },
+    );
+    Dio _dio = Dio();
+
+    Response response = await _dio.post(
+      url + '/uploads',
+      data: formData,
+      options: Options(headers: {'okok':'kkkk'}),
+    );
+    print(response);
+
+
+
+
+    // try {
+    //   var uri = Uri.parse(url + '/uploads');
+    //   var request = MultipartRequest('POST', uri);
+    //   request.files.add(await MultipartFile.fromPath('myFile', imageFile.path));
+    //   request.fields['parameter'] = '보내고 싶은 파라미터';
+    //   request.fields['parameter2'] = '보내고 싶은 파라미터2';
+    //   var res = await request.send();
+    //   print(res);
+    // } catch (err) {
+    //   print('upload err $err');
+    // }
+    //
+    //   // // open a bytestream
+    //   // var stream = http.ByteStream(DelegatingStream.typed(imageFile.openRead()));
+    //   // // get file length
+    //   // var length = await imageFile.length();
+    //   // // string to uri
+    //   // var uri = Uri.parse(url + '/uploads');
+    //   // // create multipart request
+    //   // var request = http.MultipartRequest("POST", uri);
+    //   // // multipart that takes file
+    //
+    //   ////////////////////////////////////////////
+    //
+    //   List<XFile> imageFileList = [_image,_image,_image];
+    //
+    //   var request5 = http.MultipartRequest("POST", Uri.parse(url + '/uploads'));
+    //
+    //   request5.fields['parameter'] = '보내고 싶은 파라미터';
+    //   request5.fields['parameter2'] = '보내고 싶은 파라미터2';
+    //
+    // print('00');
+    //   for (var imageFile in imageFileList) {
+    //     //var multipartFile = http.MultipartFile('myFile', stream, length, filename: basename(imageFile.path));
+    //     request5.files.add(await http.MultipartFile.fromPath('myFile', imageFile.path));
+    //   }
+    //   print('11');
+    //     var stream = http.ByteStream(imageFile.openRead());
+    //     // get file length
+    //     var length = await imageFile.length();
+    //     // string to uri
+    //
+    //   var multipartFile2 = http.MultipartFile('myFile', stream, length, filename: basename(imageFile.path));
+    //   var multipartFile3 = http.MultipartFile('myFile', stream, length, filename: basename(imageFile.path));
+    //   print('22');
+    //   List<http.MultipartFile> oksk = [];
+    //
+    //
+    //
+    //   print('33');
+    //   oksk.add(multipartFile2);
+    //   oksk.add(multipartFile3);
+    //   // request5.files.add(multipartFile2);
+    //   // request5.files.add(multipartFile2);
+    //   // request5.files.add(multipartFile2);
+    //   Iterable<http.MultipartFile> oksk2 = oksk;
+    //   //request5.files.addAll(oksk2);
+    //   print('44');
+    //
+    //   var response = await request5.send();
+    //   print('55');
+    //   /////////////////////////////////////////////
+    //
+    //   // // send
+    //   // var response = await request.send();
+    //   // print(response.statusCode);
+    //   // // listen for response
+    //   response.stream.transform(utf8.decoder).listen((value) {
+    //     print('이건뭦? ${value.length}');
+    //     print(value);
+    //   });
+  }
+
+  bool isloaded = false;
+  var result;
+
+  fetch() async {
+    //Image.network('http://172.30.1.19:3000/image')
+    print('petch pass');
+    //var response = await http.get(Uri.parse(url + '/image'));
+    var response = await http.get(Uri.parse('http://172.30.1.19:3000/jj'));
+    var s1 = response.statusCode;
+    var s2 = response.body;
+    var s3 = response.headers;
+    var s4 = response.bodyBytes;
+    print('=============================');
+    print(' state code : $s1');
+    print('=============================');
+    //print(' body : $s2');
+    print('=============================');
+    //print(' header : $s3');
+    print('=============================');
+    //print(' body bytes : $s4');
+    print('=============================');
+    print(s2);
+    //result = jsonDecode(response.body);
+
+    setState(() {
+      isloaded = true;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Text("Select an image"),
+            SizedBox(
+              height: 100,
+            ),
+            FlatButton.icon(onPressed: () async => await getImage(), icon: Icon(Icons.upload_file), label: Text("Browse")),
+            SizedBox(
+              height: 100,
+            ),
+            FlatButton.icon(onPressed: () => upload(_image), icon: Icon(Icons.upload_rounded), label: Text("Upload now")),
+            SizedBox(
+              height: 100,
+            ),
+            isloaded
+            //Container(width: 200, height: 200, color: Colors.green,)
+            //? Image.network('http://172.30.1.19:3000/jj')
+                ? Container()
+                : CircularProgressIndicator(),
+            //isloaded ? Image.asset(null) : CircularProgressIndicator(),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          fetch();
+        },
+        child: Icon(Icons.fourteen_mp_outlined),
+      ),
+    );
+  }
+}
+
+// import 'dart:convert';
+// import 'dart:io';
+// import 'dart:async';
+// import 'package:async/async.dart';
+// import 'package:http/http.dart' as http;
+// import 'package:flutter/material.dart';
+// import 'package:image_picker/image_picker.dart';
+// import 'package:path/path.dart';
+//
+// class ImageUpload extends StatefulWidget {
+//   const ImageUpload({Key? key}) : super(key: key);
+//
+//   @override
+//   _ImageUploadState createState() => _ImageUploadState();
+// }
+//
+// class _ImageUploadState extends State<ImageUpload> {
+//   late XFile _image;
+//   bool ischeck = false;
+//   final picker = ImagePicker();
+//
+//   Future<void> getImage() async {
+//     //List<XFile>? images = await ImagePicker().pickMultiImage(imageQuality: 1000, maxHeight: 1000, maxWidth: 1000);
+//     //final pickedFile = await picker.getImage(source: ImageSource.gallery);
+//
+//     XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
+//
+//     setState(() {
+//       if (pickedFile != null) {
+//         _image = pickedFile;
+//         ischeck = true;
+//       } else {
+//         print('No image selected.');
+//       }
+//     });
+//   }
+//
+//   upload(XFile imageFile) async {
+//     try {
+//       print('***********************$imageFile');
+//       // open a bytestream
+//       var stream = http.ByteStream(DelegatingStream.typed(imageFile.openRead()));
+//       // get file length
+//       print('0 (${imageFile.path})');
+//       print('0 (${imageFile.readAsBytes()})');
+//       print('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%');
+//       int length = await imageFile.length();
+//       print('============================== $length');
+//       // string to uri
+//       //String url = 'http://172.30.1.19:3000/image';
+//       var uri = Uri.parse("http://172.30.1.19:3000/upload");
+//       print('1');
+//       // create multipart request
+//       var request = http.MultipartRequest("POST", uri);
+//       print('2');
+//       // multipart that takes file
+//       var multipartFile = http.MultipartFile('myFile', stream, length, filename: basename(imageFile.path));
+//       print('3');
+//       // add file to multipart
+//       request.files.add(multipartFile);
+//       print('4');
+//       // send
+//       var response = await request.send();
+//       print(response.statusCode);
+//       print('5');
+//       // listen for response
+//       response.stream.transform(utf8.decoder).listen((value) {
+//         print('6');
+//         print(value);
+//       });
+//       print('7');
+//     } catch (e) {
+//       print(' err ??? $e');
+//     }
+//   }
+//
+//   bool isloaded = false;
+//   var result;
+//
+//   fetch() async {
+//     print('가져오기 패쓰');
+//     String url = 'http://172.30.1.19:3000/image';
+//     var response = await http.get(Uri.parse(url));
+//     print(response.statusCode);
+//
+//
+//     print(result[0]['image']);
+//
+//
+//     setState(() {
+//       isloaded = true;
+//     });
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     fetch();
+//     return Scaffold(
+//       appBar: AppBar(),
+//       body: Column(
+//         crossAxisAlignment: CrossAxisAlignment.center,
+//         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//         children: [
+//           ischeck ? Container(width: 500, height: 300, child: Image.network(_image.path)) : CircularProgressIndicator(),
+//           Text("Select an image"),
+//           FlatButton.icon(onPressed: () async => await getImage(), icon: Icon(Icons.upload_file), label: Text("Browse")),
+//           SizedBox(
+//             height: 20,
+//           ),
+//           FlatButton.icon(onPressed: () => upload(_image), icon: Icon(Icons.upload_rounded), label: Text("Upload now")),
+//           isloaded ? Image.network('http://172.30.1.19:3000/${result[0]['image']}') : CircularProgressIndicator(),
+//         ],
+//       ),
+//     );
+//   }
+// }

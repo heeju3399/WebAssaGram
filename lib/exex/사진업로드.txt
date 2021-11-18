@@ -1,0 +1,147 @@
+
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      home: MyHomePage(),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider<MyProvider>(
+      create: (BuildContext context) => MyProvider(),
+      child: Scaffold(
+          backgroundColor: Colors.black,
+          appBar: AppBar(
+            title: const Text('사진 업로드'),
+            centerTitle: true,
+            actions: [
+              Consumer<MyProvider>(builder: (context, provider, child)  {
+                return Row(
+                  children: [
+                    ElevatedButton(onPressed: ()  {
+                      callProvider(provider);
+                    }, child: Text('add')),
+                    ElevatedButton(onPressed: (){
+                      provider.cancel();
+                    }, child: Text('cancel')),
+                  ],
+                );
+              }),
+            ],
+          ),
+          body: Consumer<MyProvider>(builder: (context, provider, child) {
+            print('provider build pass!!');
+            print('---------------------------------------');
+            //var ss = provider.images!.length;
+            print(provider.images);
+            print('---------------------------------------');
+            if (provider.images != null) {
+              return GridView.builder(
+                  shrinkWrap: true,
+                  itemCount: provider.images!.length, //item 개수
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3, //1 개의 행에 보여줄 item 개수
+                    //childAspectRatio: 1 / 2, //item 의 가로 1, 세로 2 의 비율
+                    // mainAxisSpacing: 10, //수평 Padding
+                    // crossAxisSpacing: 10, //수직 Padding
+                  ),
+                  itemBuilder: (BuildContext context, int index) {
+                    print('grid build pass!! ');
+                    List<XFile>? aa = provider.images;
+                    XFile bb = aa!.elementAt(index);
+                    print('***********************************!! ${bb.path}');
+                    //item 의 반목문 항목 형성
+                    return Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Image.network(bb.path),
+//               //Image.network(provider.image.path),
+//               //if (provider.images != null)
+                    );
+                  });
+            } else {
+              return Container(
+                width: 100,
+                height: 100,
+                color: Colors.yellow,
+                child: ElevatedButton(
+                  child: Text('gogo'),
+                  onPressed: () async {
+
+
+                  },
+                ),
+              );
+            }
+          })),
+    );
+  }
+
+  void callProvider(MyProvider provider)async{
+    List<XFile>? image =await ImagePicker().pickMultiImage(imageQuality: 1000, maxHeight: 1000, maxWidth: 1000);
+    provider.setImages(image);
+  }
+
+
+}
+
+class MyProvider extends ChangeNotifier {
+  dynamic image;
+  dynamic imagefile;
+  List<XFile>? images;
+
+  Future setImages(List<XFile>? img) async {
+    print('imges===================== setImages pass');
+    // for(var ss in img!){
+    //   print(ss.path);
+    // }
+    // print('==============================================????');
+    images = img;
+
+    notifyListeners();
+  }
+
+  Future setImage(dynamic img) async {
+    print('img??? : ${img.toString()}');
+    String aa = img.toString();
+    XFile bb = img;
+    print(' img path : ${bb.path} ');
+    print(' img name : ${bb.name} ');
+    print(' img mime type : ${bb.mimeType} ');
+    Future<int> cc = bb.length();
+    cc.then((value) => {print('lenth?? : $value')});
+
+    print('==============================================????');
+
+    await bb.readAsBytes().then((value) => {imagefile = value});
+
+    image = img;
+    notifyListeners();
+  }
+
+  void cancel() {
+    images = null;
+    notifyListeners();
+  }
+}
