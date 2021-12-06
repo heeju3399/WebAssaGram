@@ -1,15 +1,15 @@
 class ContentDataModel {
-  const ContentDataModel(
-      {required this.contentId,
-      required this.createTime,
-      required this.userId,
-      required this.visible,
-      required this.comment,
-      required this.content,
-      required this.viewCount,
-      required this.badCount,
-      required this.likeCount,
-      required this.images});
+  const ContentDataModel({required this.contentId,
+    required this.createTime,
+    required this.userId,
+    required this.visible,
+    required this.comment,
+    required this.content,
+    required this.viewCount,
+    required this.badCount,
+    required this.likeCount,
+    required this.nicName,
+    required this.images});
 
   final int contentId;
   final String content;
@@ -17,6 +17,7 @@ class ContentDataModel {
   final int badCount;
   final int viewCount;
   final String userId;
+  final String nicName;
   final String createTime;
   final String visible;
   final List<dynamic> comment;
@@ -25,6 +26,7 @@ class ContentDataModel {
   factory ContentDataModel.fromJson(Map<dynamic, dynamic> json) {
     return ContentDataModel(
       contentId: json['contentseq'],
+      nicName: json['nicname'],
       content: json['content'],
       userId: json['userid'],
       createTime: json['createtime'],
@@ -49,11 +51,11 @@ class ImagesDataModel {
 
   factory ImagesDataModel.fromJson(Map<dynamic, dynamic> json) {
     return ImagesDataModel(
-      destination: json['destination'],
-      filename: json['filename'],
-      mimetype: json['mimetype'],
-      originalName: json['originalname'],
-      path: json['path']
+        destination: json['destination'],
+        filename: json['filename'],
+        mimetype: json['mimetype'],
+        originalName: json['originalname'],
+        path: json['path']
 
     );
   }

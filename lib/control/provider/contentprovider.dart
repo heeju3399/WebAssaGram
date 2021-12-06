@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:web/model/content.dart';
 import 'package:web/server/nodeserver.dart';
@@ -11,6 +10,32 @@ class ContentProvider extends ChangeNotifier {
 
   List<dynamic> contentDataModelList = [];
   int getContentCountPlus = 5;
+  List<Map> indexContentId = [];
+  bool firstPass = true;
+
+  // void setIndexContentId(int index, int contentId) {
+  //     Map<int, int> map = {index: contentId};
+  //     indexContentId.add(map);
+  // }
+  //
+  // void viewoksk() {
+  //   print('indexContentId?? $indexContentId');
+  // }
+
+  // void deleteMainContent(int contentId) {
+  //   int aa = 99999;
+  //   for (var map in indexContentId) {
+  //     map.forEach((index, contentIdValue) {
+  //       print('value?!! $index // contentid $contentIdValue');
+  //       if(contentIdValue == contentId){
+  //         aa = index;
+  //         print('이놈이다 $index');
+  //       }
+  //     });
+  //   }
+  //   contentDataModelList.removeAt(aa);
+  //   notifyListeners();
+  // }
 
   void initGetContent() async {
     String notApproved = 'not pass';
@@ -27,6 +52,7 @@ class ContentProvider extends ChangeNotifier {
       print('pass');
       contentDataModelList = result;
     }
+
     notifyListeners();
     getContentCountPlus = getContentCountPlus + 5;
   }
@@ -65,6 +91,7 @@ class ContentProvider extends ChangeNotifier {
           contentId: contentDataModel.contentId,
           userId: contentDataModel.userId,
           images: contentDataModel.images,
+          nicName: contentDataModel.nicName,
           comment: contentDataModel.comment,
           createTime: contentDataModel.createTime,
           visible: contentDataModel.visible,
@@ -81,6 +108,7 @@ class ContentProvider extends ChangeNotifier {
           contentId: contentDataModel.contentId,
           userId: contentDataModel.userId,
           images: contentDataModel.images,
+          nicName: contentDataModel.nicName,
           comment: contentDataModel.comment,
           createTime: contentDataModel.createTime,
           visible: contentDataModel.visible,
@@ -117,6 +145,7 @@ class ContentProvider extends ChangeNotifier {
         contentId: contentDataModel.contentId,
         userId: contentDataModel.userId,
         images: contentDataModel.images,
+        nicName: contentDataModel.nicName,
         comment: commentDataList,
         createTime: contentDataModel.createTime,
         visible: contentDataModel.visible,

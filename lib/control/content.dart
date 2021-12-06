@@ -1,6 +1,7 @@
 
 
 import 'package:image_picker/image_picker.dart';
+import 'package:web/control/provider/userprovider.dart';
 import 'package:web/server/nodeserver.dart';
 
 class ContentControl {
@@ -13,11 +14,8 @@ class ContentControl {
     }else{
       result = 'no';
     }
-
     return result;
   }
-
-
 
   static String contentTimeStamp(String date){
     String resultTime = '';
@@ -33,10 +31,6 @@ class ContentControl {
     String agoHours = '시간전';
     String agoMinute = '분전';
 
-    // print('result $result');
-    // print('difDay $difDay');
-    // print('difHour $difHour');
-    // print('difMin $difMin');
     if (difMin <= 60 && difMin >= 0) {
       //print('0~60분 사이');
       resultTime = difMin.toString() + agoMinute;
@@ -66,7 +60,7 @@ class ContentControl {
     return resultTime;
   }
 
-  static Future<Map> setContent({required String title,required List<XFile> images, required String userId}) async {
+  static Future<Map> setContent({required String title,required List<XFile> images, required UserProvider userProvider}) async {
     print('setcontent control pass');
     Map resultMap = {};
     bool result = false;
@@ -75,7 +69,7 @@ class ContentControl {
     } else if(images.isEmpty){
       resultMap = {'title': '사진이 없어요', 'message': '사진을 추가해 주세요'};
     } else {
-      await NodeServer.setContents(images: images, userId: userId, title: title).then((value) => {result = value});
+      await NodeServer.setContents(images: images,userProvider: userProvider, title: title).then((value) => {result = value});
       if (result) {
         resultMap = {'title': 'pass', 'message': ''};
       } else {

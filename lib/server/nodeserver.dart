@@ -1,48 +1,59 @@
 import 'dart:convert';
 import "dart:convert" show utf8;
-
-import 'dart:io';
-
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:web/control/provider/userprovider.dart';
 import 'package:web/model/content.dart';
-
 import 'package:web/model/myword.dart';
 
 // ignore_for_file: avoid_print
 class NodeServer {
-  // postFile(List<XFile> files) async {
-  //
-  //   FormData formData = FormData.fromMap({
-  //     "attachments": files,
-  //   });
-  //   var dio = Dio();
-  //
-  //   try {
-  //     var response = await dio.post(
-  //       MyWord.localhostContentServerIp,
-  //       data: formData, queryParameters: {'sitekey':'abs','s':'f'},
-  //
-  //     );
-  //
-  //     print("응답" + response.data.toString());
-  //   } catch (eee) {
-  //     print(eee);
-  //     print("error occur");
-  //   }
-  // }
 
-  static Future<bool> setContents({required String title, required List<XFile> images, required String userId}) async {
-    print('set content pass');
+  static Future<bool> googleAccessSignIn(String email, String name, String id) async {
+    print('nodeserver google access signin pass');
+    bool returnBool = false;
+    String flag = 'googleAccessSignIn';
+    String siteKey = 'secretKey';
+    String url = MyWord.serverIpAndPort + '/user';
+    Map<String, String> map = {};
+    map = {"siteKey": siteKey, "email": email, "name": name, "googleAccessId": id, "flag": flag};
+
+    try {
+      Response response = await http.post(Uri.parse(url), headers: map);
+      print(response.body);
+      int stateCode = response.statusCode;
+      if (stateCode == 200) {
+        var result = jsonDecode(response.body);
+        String approved = result.values.elementAt(0);
+        print(approved);
+        if (approved == 'pass') {
+          returnBool = true;
+        }
+      }
+    } catch (e) {
+      print('signIn err : $e');
+    }
+
+    return returnBool;
+  }
+
+  static Future<bool> setContents({required String title, required List<XFile> images, required UserProvider userProvider}) async {
+    print('set content pass ${userProvider.userId}');
     Map<String, String> map = {};
     String flag = 'setContents';
     String siteKey = 'secretKey';
-    map = {"sitekey": siteKey, "flag": flag, "userid": userId};
+    String url = MyWord.serverIpAndPort + '/setcontents';
+    map = {
+      "sitekey": siteKey,
+      "flag": flag,
+      "userid": userProvider.userId,
+      "usergoogleaccessid": userProvider.googleAccessId,
+    };
     bool returnResult = false;
-    String url = 'http://172.30.1.19:3000';
-    Uri uri = Uri.parse(url + '/setcontents');
+
+    Uri uri = Uri.parse(url);
     MultipartRequest request = http.MultipartRequest("POST", uri);
     if (images.isNotEmpty) {
       for (var file in images) {
@@ -60,7 +71,8 @@ class NodeServer {
         );
         request.files.add(multipartFile);
       }
-      request.fields['content'] = title;
+      var contentEncode = utf8.encode(title);
+      request.fields['content'] = '$contentEncode';
       request.headers.addAll(map);
       print('//////////////////////////////////');
       print(request.toString());
@@ -70,14 +82,10 @@ class NodeServer {
         print(response.statusCode);
         if (state == 200) {
           String respStr = await response.stream.bytesToString();
-          print('0000000000000000000000000000');
-          print(respStr);
-          print(response.statusCode);
-          print(response.headers);
-          respStr = respStr.substring(10, 14);
-          if (respStr.contains('pass')) {
+          Map<dynamic, dynamic> responsePassCheck = jsonDecode(respStr);
+          if (responsePassCheck.values.elementAt(0) == 'pass') {
             returnResult = true;
-          } else if (respStr.contains('no')) {
+          } else {
             returnResult = false;
           }
         } else if (state == 500) {}
@@ -86,6 +94,43 @@ class NodeServer {
       }
     }
     return returnResult;
+  }
+
+  static Future<List<dynamic>> getUserContent(int getContentCountPlus, String userId) async {
+    List<dynamic> returnList = [];
+    print('npde serverr getusercontents pass');
+    String flag = 'getusercontents';
+    String url = MyWord.serverIpAndPort + '/getusercontents';
+    String siteKey = 'secretKey';
+    Map<String, String> map = {};
+    map = {"sitekey": siteKey, "flag": flag, "getcontentcountplus": '$getContentCountPlus', "userid": userId};
+
+    try {
+      var response = await http.post(Uri.parse(url), headers: map);
+      int state = response.statusCode;
+      print(response.statusCode);
+      if (state == 200) {
+        Map result = jsonDecode(response.body);
+        //print(result);
+        String approved = result.values.elementAt(0);
+        List message = result.values.elementAt(1);
+        print('=============================');
+        print(approved);
+        if (approved == 'pass') {
+          for (Map<dynamic, dynamic> element1 in message) {
+            ContentDataModel contentDataModel = ContentDataModel.fromJson(element1);
+            returnList.add(contentDataModel);
+          }
+        } else {
+          returnList.add('not pass');
+        }
+      } else {
+        returnList.add('state err');
+      }
+    } catch (e) {
+      returnList.add('server connect fail');
+    }
+    return returnList;
   }
 
   static Future<List<dynamic>> getContent(int getContentCountPlus) async {
@@ -184,59 +229,60 @@ class NodeServer {
 //   return returnResult;
 // }
 //
-// static Future<bool> deleteContent(int contentId, String userId) async {
-//   String flag = 'deleteContent';
-//   String siteKey = 'secretKey'; //실제 쓰일댄 이렇게 쓰면안됨 파이버 베이스 같은곳에 넣어서 쓰기
-//   bool returnResult = false;
-//   Map<String, String> map = {};
-//   map = {"siteKey": siteKey, "flag": flag, "contentid": '$contentId', "id": userId};
-//   try {
-//     var response = await http.post(Uri.parse('${MyWord.ipAndPort}deletecontent'), headers: map);
-//     int stateCode = response.statusCode;
-//     print('$stateCode pass');
-//     if (stateCode == 200) {
-//       Map responseValue = jsonDecode(response.body);
-//
-//       if (responseValue.values.first.contains('pass')) {
-//         returnResult = true;
-//       } else if (responseValue.values.first.contains('no')) {
-//         returnResult = false;
-//       }
-//     }
-//   } catch (e) {
-//     print('setComment error :$e');
-//     returnResult = false;
-//   }
-//
-//   return returnResult;
-// }
-//
-// static Future<bool> deleteAllContent(int contentId, String userId) async {
-//   String flag = 'deleteAllContent';
-//   String siteKey = 'secretKey'; //실제 쓰일댄 이렇게 쓰면안됨 파이버 베이스 같은곳에 넣어서 쓰기
-//   bool returnResult = false;
-//   Map<String, String> map = {};
-//   map = {"siteKey": siteKey, "flag": flag, "contentid": '$contentId', "id": userId};
-//   try {
-//     var response = await http.post(Uri.parse('${MyWord.ipAndPort}deleteallcontent'), headers: map);
-//     int stateCode = response.statusCode;
-//     print('$stateCode pass');
-//     if (stateCode == 200) {
-//       Map responseValue = jsonDecode(response.body);
-//
-//       if (responseValue.values.first.contains('pass')) {
-//         returnResult = true;
-//       } else if (responseValue.values.first.contains('no')) {
-//         returnResult = false;
-//       }
-//     }
-//   } catch (e) {
-//     print('setComment error :$e');
-//     returnResult = false;
-//   }
-//
-//   return returnResult;
-// }
+static Future<bool> deleteContent(int contentId, String userId) async {
+  String flag = 'deleteContent';
+  String siteKey = 'secretKey';
+  String url = MyWord.serverIpAndPort + '/deletecontent';
+  bool returnResult = false;
+  Map<String, String> map = {};
+  map = {"siteKey": siteKey, "flag": flag, "contentid": '$contentId', "id": userId};
+  try {
+    var response = await http.post(Uri.parse(url), headers: map);
+    int stateCode = response.statusCode;
+    print('$stateCode pass');
+    if (stateCode == 200) {
+      Map responseValue = jsonDecode(response.body);
+      if (responseValue.values.first.contains('pass')) {
+        returnResult = true;
+      } else if (responseValue.values.first.contains('no')) {
+        returnResult = false;
+      }
+    }
+  } catch (e) {
+    print('setComment error :$e');
+    returnResult = false;
+  }
+
+  return returnResult;
+}
+
+static Future<bool> deleteAllContent(String userId) async {
+  String flag = 'deleteAllContent';
+  String siteKey = 'secretKey'; //실제 쓰일댄 이렇게 쓰면안됨 파이버 베이스 같은곳에 넣어서 쓰기
+  String url = MyWord.serverIpAndPort + '/deleteallcontent';
+  bool returnResult = false;
+  Map<String, String> map = {};
+  map = {"siteKey": siteKey, "flag": flag, "id": userId};
+  try {
+    var response = await http.post(Uri.parse(url), headers: map);
+    int stateCode = response.statusCode;
+    print('$stateCode pass');
+    if (stateCode == 200) {
+      Map responseValue = jsonDecode(response.body);
+
+      if (responseValue.values.first.contains('pass')) {
+        returnResult = true;
+      } else if (responseValue.values.first.contains('no')) {
+        returnResult = false;
+      }
+    }
+  } catch (e) {
+    print('setComment error :$e');
+    returnResult = false;
+  }
+
+  return returnResult;
+}
 //
 // static Future<List<dynamic>> getUserContents({ String userId}) async {
 //   String flag = 'getusercontent';
@@ -269,13 +315,14 @@ class NodeServer {
   static Future<bool> setComment({required String value, required int index, required String userId}) async {
     String flag = 'setcomment';
     String siteKey = 'secretKey'; //실제 쓰일댄 이렇게 쓰면안됨 파이버 베이스 같은곳에 넣어서 쓰기
+    String url = MyWord.serverIpAndPort + '/setcomment';
     bool returnResult = false;
     Map<String, String> map = {};
 
     var contentEncode = utf8.encode(value);
     map = {"siteKey": siteKey, "id": userId, "comment": '$contentEncode', "flag": flag, "contentseq": '$index'};
     try {
-      var response = await http.post(Uri.parse(MyWord.localhostSetCommentServerIp), headers: map);
+      var response = await http.post(Uri.parse(url), headers: map);
       int stateCode = response.statusCode;
       print('$stateCode pass');
       if (stateCode == 200) {
@@ -298,15 +345,15 @@ class NodeServer {
     String flag = 'setlikeandbad';
     String siteKey = 'secretKey'; //실제 쓰일댄 이렇게 쓰면안됨 파이버 베이스 같은곳에 넣어서 쓰기
     bool returnResult = false;
+    String url = MyWord.serverIpAndPort + '/likeandbad';
     Map<String, String> map = {};
     //print('???? $likeAndBadCount');
     map = {"siteKey": siteKey, "flag": flag, "likeandbadflag": '$likeAndBadFlag', "likeandbadcount": '$likeAndBadCount', "contentid": '$contentId'};
 
     try {
-      var response = await http.post(Uri.parse(MyWord.localhostLikeAndBadServerIp), headers: map);
+      var response = await http.post(Uri.parse(url), headers: map);
       int stateCode = response.statusCode;
       if (stateCode == 200) {
-
         Map<dynamic, dynamic> responsePassCheck = jsonDecode(response.body);
         if (responsePassCheck.values.elementAt(0) == 'pass') {
           returnResult = true;
@@ -320,6 +367,7 @@ class NodeServer {
     }
     return returnResult;
   }
+
 //
 // void getLikeAndBad() async {}
 
@@ -351,48 +399,105 @@ class NodeServer {
 //   return returnList;
 // }
 //
-// static Future<LogInResponse> signIn(String id, String pass) async {
-//   String flag = 'signIn';
-//   String siteKey = 'secretKey'; //실제 쓰일댄 이렇게 쓰면안됨 파이버 베이스 같은곳에 넣어서 쓰기
-//   var response;
-//   LogInResponse logInResult = LogInResponse(stateCode: 000, message: '서버 접속 불가', title: 'err');
-//   Map<String, String> map = Map();
-//   map = {"siteKey": '$siteKey', "id": '$id', "pass": '$pass', "flag": '$flag'};
-//   try {
-//     response = await http.post(Uri.parse('${MyWord.ipAndPort}login'), headers: map);
-//     int stateCode = response.statusCode;
-//     Map stateMap = Map();
-//     Map<dynamic, dynamic> returnMap = Map();
-//     var decode = jsonDecode(response.body);
-//     returnMap.addAll(decode);
-//     stateMap = {'stateCode': stateCode};
-//     returnMap.addAll(stateMap);
-//     logInResult = LogInResponse.fromJson(returnMap);
-//   } catch (e) {
-//     print('signIn err : $e');
-//   }
-//   return logInResult;
-// }
+  static Future<int> signIn(String id, String pass) async {
+    int returnInt = 0;
+    String flag = 'signIn';
+    String siteKey = 'secretKey'; //실제 쓰일댄 이렇게 쓰면안됨 파이버 베이스 같은곳에 넣어서 쓰기
+    String url = MyWord.serverIpAndPort + '/user';
+    Map<String, String> map = {};
+    map = {"siteKey": siteKey, "id": id, "pass": pass, "flag": flag};
+    try {
+      http.Response response = await http.post(Uri.parse(url), headers: map);
+      int stateCode = response.statusCode;
+      if (stateCode == 200) {
+        Map<dynamic, dynamic> responsePassCheck = jsonDecode(response.body);
+        print(responsePassCheck);
+        if (responsePassCheck.values.elementAt(0) == 'pass') {
+          if (responsePassCheck.values.elementAt(1) == true) {
+            //아이디와 비번이 맞음 통과
+            returnInt = 1;
+            print('Pass!!!!!!!');
+          } else {
+            //아이디 중복 안됨
+            returnInt = 2; //서버와 통신은 잘됨 아이디와 비밀번호가 다름!!
+            print('노노!!!!!!!');
+          }
+        } else if (responsePassCheck.values.elementAt(0) == 'FE') {
+          returnInt = 0; //서버에러
+          print('FE!!!!!!!');
+        } else if (responsePassCheck.values.elementAt(0) == 'SK') {
+          returnInt = 0; //서버에러
+          print('SK!!!!!!!');
+        }
+      } else {
+        returnInt = 0; // 200 아님
+      }
+    } catch (e) {
+      print('signIn err : $e');
+      returnInt = 0; // 서버 통신 장애
+    }
+    return returnInt;
+  }
+
 //
-// static Future<SignupResponse> signUp({ String id,  String pass,  String name}) async {
-//   String flag = 'signup';
-//   String siteKey = 'secretKey'; //실제 쓰일댄 이렇게 쓰면안됨 파이버 베이스 같은곳에 넣어서 쓰기
-//   Map<String, String> requestMap = Map();
-//   requestMap = {"siteKey": '$siteKey', "id": '$id', "pass": '$pass', "name": '$name', "flag": '$flag'};
-//   SignupResponse signUpResponse = SignupResponse(stateCode: 000, message: '서버 접속 불가', title: 'err');
-//   try {
-//     var response = await http.post(Uri.parse('${MyWord.ipAndPort}signup'), headers: requestMap);
-//     int stateCode = response.statusCode;
-//     Map returnMap = Map();
-//     Map<dynamic, dynamic> stateMap = Map();
-//     var decode = jsonDecode(response.body);
-//     stateMap.addAll(decode);
-//     returnMap = {'stateCode': stateCode};
-//     stateMap.addAll(returnMap);
-//     signUpResponse = SignupResponse.fromJson(stateMap);
-//   } catch (e) {
-//     print('signup err : $e');
-//   }
-//   return signUpResponse;
-// }
+  static Future<int> doubleCheck(String id) async {
+    int result = 0;
+    String flag = 'doublecheck';
+    String siteKey = 'secretKey'; //실제 쓰일댄 이렇게 쓰면안됨 파이버 베이스 같은곳에 넣어서 쓰기
+    String url = MyWord.serverIpAndPort + '/user';
+    Map<String, String> requestMap = {};
+
+    requestMap = {"siteKey": siteKey, "id": id, "flag": flag};
+    try {
+      var response = await http.post(Uri.parse(url), headers: requestMap);
+      int stateCode = response.statusCode;
+      if (stateCode == 200) {
+        Map<dynamic, dynamic> responsePassCheck = jsonDecode(response.body);
+        print(responsePassCheck);
+        if (responsePassCheck.values.elementAt(0) == 'pass') {
+          if (responsePassCheck.values.elementAt(1) == 'true') {
+            //아이디가 중복된다는 것임
+            result = 2; //서버와 통신은 잘되는데 아이디만 중복됨
+          } else {
+            //아이디 중복 안됨
+            result = 1; //서버와 통신은 잘되고 아이디도 중복 안됨
+          }
+        } else {
+          result = 0; //서버에러
+        }
+      } else {
+        result = 0; //서버에러
+      }
+    } catch (e) {
+      print('signup err : $e');
+      result = 0; //서버에러
+    }
+    return result;
+  }
+
+  static Future<bool> signUp(String id, String pass) async {
+    bool result = false;
+    String flag = 'signup';
+    String siteKey = 'secretKey'; //실제 쓰일댄 이렇게 쓰면안됨 파이버 베이스 같은곳에 넣어서 쓰기
+    String url = MyWord.serverIpAndPort + '/user';
+    Map<String, String> requestMap = {};
+    requestMap = {"siteKey": siteKey, "id": id, "pass": pass, "flag": flag};
+
+    try {
+      var response = await http.post(Uri.parse(url), headers: requestMap);
+      int stateCode = response.statusCode;
+      if (stateCode == 200) {
+        Map<dynamic, dynamic> responsePassCheck = jsonDecode(response.body);
+        print(responsePassCheck);
+        if (responsePassCheck.values.elementAt(0) == 'pass') {
+          result = true;
+        } else {
+          result = false; //서버에러
+        }
+      }
+    } catch (e) {
+      print('signup err : $e');
+    }
+    return result;
+  }
 }
