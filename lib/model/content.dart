@@ -65,7 +65,7 @@ class CommentDataModel {
   const CommentDataModel({required this.comment, required this.visible, required this.userId, required this.createTime, required this.commentSeq});
 
   final String comment;
-  final int commentSeq;
+  final String commentSeq;
   final String visible;
   final String userId;
   final String createTime;

@@ -138,9 +138,10 @@ class NodeServer {
     print('getContent pass');
     String flag = 'getContents';
     String siteKey = 'secretKey';
+    String url = MyWord.serverIpAndPort + '/getcontents';
     Map<String, String> map = {};
     map = {"sitekey": siteKey, "flag": flag, "getcontentcountplus": '$getContentCountPlus'};
-    Uri uri = Uri.parse('http://172.30.1.19:3000/getcontents');
+    Uri uri = Uri.parse(url);
     try {
       var response = await http.post(uri, headers: map);
       int state = response.statusCode;
@@ -157,17 +158,6 @@ class NodeServer {
             ContentDataModel contentDataModel = ContentDataModel.fromJson(element1);
             returnList.add(contentDataModel);
           }
-          // for (ContentDataModel contentdata in returnList) {
-          //   for (var element in contentdata.images) {
-          //     ImagesDataModel imagesDataModel = ImagesDataModel.fromJson(element);
-          //     print(imagesDataModel.path);
-          //   }
-          //   for (var element in contentdata.comment) {
-          //     CommentDataModel commentDataModel = CommentDataModel.fromJson(element);
-          //     print(commentDataModel.createTime);
-          //     print('=============================');
-          //   }
-          // }
         } else {
           returnList.add('not pass');
         }
@@ -180,54 +170,56 @@ class NodeServer {
     return returnList;
   }
 
-// static Future<bool> userDelete({String userId}) async {
-//   String flag = 'userDelete';
-//   String siteKey = 'secretKey'; //실제 쓰일댄 이렇게 쓰면안됨 파이버 베이스 같은곳에 넣어서 쓰기
-//   bool returnResult = false;
-//   Map<String, String> map = {};
-//   map = {"siteKey": siteKey, "flag": flag, "id": userId};
-//   try {
-//     var response = await http.post(Uri.parse('${MyWord.ipAndPort}userdelete'), headers: map);
-//     int stateCode = response.statusCode;
-//     if (stateCode == 200) {
-//       Map responseValue = jsonDecode(response.body);
-//       if (responseValue.values.first.contains('pass')) {
-//         returnResult = true;
-//       } else if (responseValue.values.first.contains('no')) {
-//         returnResult = false;
-//       }
-//     }
-//   } catch (e) {
-//     print('deleteComment error :$e');
-//     returnResult = false;
-//   }
-//   return returnResult;
-// }
+static Future<bool> userWithdrawal(String userId, String googleId) async {
+  String flag = 'wdelete';
+  String siteKey = 'secretKey';
+  bool returnResult = false;
+  String url = MyWord.serverIpAndPort + '/user';
+  Map<String, String> map = {};
+  map = {"siteKey": siteKey, "flag": flag, "id": userId, "googleAccessId": googleId,};
+  try {
+    var response = await http.post(Uri.parse(url), headers: map);
+    int stateCode = response.statusCode;
+    if (stateCode == 200) {
+      Map responseValue = jsonDecode(response.body);
+      if (responseValue.values.first.contains('pass')) {
+        returnResult = true;
+      } else if (responseValue.values.first.contains('no')) {
+        returnResult = false;
+      }
+    }
+  } catch (e) {
+    print('deleteComment error :$e');
+    returnResult = false;
+  }
+  return returnResult;
+}
 //
-// static Future<bool> deleteComment({ int contentId,  String userId,  int order}) async {
-//   String flag = 'deleteComment';
-//   String siteKey = 'secretKey'; //실제 쓰일댄 이렇게 쓰면안됨 파이버 베이스 같은곳에 넣어서 쓰기
-//   bool returnResult = false;
-//   Map<String, String> map = {};
-//   map = {"siteKey": siteKey, "flag": flag, "contentid": '$contentId', "id": userId, "order": '$order'};
-//   try {
-//     var response = await http.post(Uri.parse('${MyWord.ipAndPort}deletecomment'), headers: map);
-//     int stateCode = response.statusCode;
-//     print('$stateCode pass');
-//     if (stateCode == 200) {
-//       Map responseValue = jsonDecode(response.body);
-//       if (responseValue.values.first.contains('pass')) {
-//         returnResult = true;
-//       } else if (responseValue.values.first.contains('no')) {
-//         returnResult = false;
-//       }
-//     }
-//   } catch (e) {
-//     print('deleteComment error :$e');
-//     returnResult = false;
-//   }
-//   return returnResult;
-// }
+static Future<bool> deleteComment( int contentId,  String userId,  String commentSeq ) async {
+  String flag = 'deleteComment';
+  String siteKey = 'secretKey';
+  bool returnResult = false;
+  String url = MyWord.serverIpAndPort + '/deletecomment';
+  Map<String, String> map = {};
+  map = {"siteKey": siteKey, "flag": flag, "contentid": '$contentId',  "commentseq": commentSeq};
+  try {
+    var response = await http.post(Uri.parse(url), headers: map);
+    int stateCode = response.statusCode;
+    print('$stateCode pass');
+    if (stateCode == 200) {
+      Map responseValue = jsonDecode(response.body);
+      if (responseValue.values.first.contains('pass')) {
+        returnResult = true;
+      } else{
+        returnResult = false;
+      }
+    }
+  } catch (e) {
+    print('deleteComment error :$e');
+    returnResult = false;
+  }
+  return returnResult;
+}
 //
 static Future<bool> deleteContent(int contentId, String userId) async {
   String flag = 'deleteContent';
@@ -259,7 +251,7 @@ static Future<bool> deleteContent(int contentId, String userId) async {
 static Future<bool> deleteAllContent(String userId) async {
   String flag = 'deleteAllContent';
   String siteKey = 'secretKey'; //실제 쓰일댄 이렇게 쓰면안됨 파이버 베이스 같은곳에 넣어서 쓰기
-  String url = MyWord.serverIpAndPort + '/deleteallcontent';
+  String url = MyWord.serverIpAndPort + '/deletecontent';
   bool returnResult = false;
   Map<String, String> map = {};
   map = {"siteKey": siteKey, "flag": flag, "id": userId};
@@ -283,42 +275,13 @@ static Future<bool> deleteAllContent(String userId) async {
 
   return returnResult;
 }
-//
-// static Future<List<dynamic>> getUserContents({ String userId}) async {
-//   String flag = 'getusercontent';
-//   String siteKey = 'secretKey'; //실제 쓰일댄 이렇게 쓰면안됨 파이버 베이스 같은곳에 넣어서 쓰기
-//   Map<String, String> map = Map();
-//   List returnList = [];
-//   map = {"siteKey": '$siteKey', "flag": '$flag', "id": '$userId'};
-//   try {
-//     var response = await http.post(Uri.parse('${MyWord.ipAndPort}getusercontent'), headers: map);
-//     int stateCode = response.statusCode;
-//     print('$stateCode pass');
-//     if (stateCode == 200) {
-//       Map<dynamic, dynamic> responsePassCheck = jsonDecode(response.body);
-//       if (responsePassCheck.values.elementAt(0).contains('pass')) {
-//         returnList.add('pass');
-//         String mainDashContent = responsePassCheck.values.elementAt(1).toString();
-//         returnList.add(jsonDecode(mainDashContent));
-//       }
-//     } else {
-//       returnList.add('no');
-//     }
-//   } catch (e) {
-//     print('getUserContents err : $e');
-//     returnList.add('err');
-//   }
-//
-//   return returnList;
-// }
-//
-  static Future<bool> setComment({required String value, required int index, required String userId}) async {
+
+  static Future<List> setComment({required String value, required int index, required String userId}) async {
     String flag = 'setcomment';
     String siteKey = 'secretKey'; //실제 쓰일댄 이렇게 쓰면안됨 파이버 베이스 같은곳에 넣어서 쓰기
     String url = MyWord.serverIpAndPort + '/setcomment';
-    bool returnResult = false;
+    List returnResult = [];
     Map<String, String> map = {};
-
     var contentEncode = utf8.encode(value);
     map = {"siteKey": siteKey, "id": userId, "comment": '$contentEncode', "flag": flag, "contentseq": '$index'};
     try {
@@ -328,19 +291,23 @@ static Future<bool> deleteAllContent(String userId) async {
       if (stateCode == 200) {
         Map<dynamic, dynamic> responsePassCheck = jsonDecode(response.body);
         if (responsePassCheck.values.elementAt(0) == 'pass') {
-          returnResult = true;
+          var rere = responsePassCheck.values.elementAt(1);
+          returnResult.add('pass');
+          returnResult.add(rere);
         } else {
-          returnResult = false;
+          returnResult.add('no');
         }
+      }else{
+        returnResult.add('not 200');
       }
     } catch (e) {
       print('setComment error :$e');
-      returnResult = false;
+      returnResult.add('err');
     }
     return returnResult;
   }
 
-//
+
   static Future<bool> setLikeAndBad({required int contentId, required int likeAndBadFlag, required int likeAndBadCount}) async {
     String flag = 'setlikeandbad';
     String siteKey = 'secretKey'; //실제 쓰일댄 이렇게 쓰면안됨 파이버 베이스 같은곳에 넣어서 쓰기
@@ -368,37 +335,7 @@ static Future<bool> deleteAllContent(String userId) async {
     return returnResult;
   }
 
-//
-// void getLikeAndBad() async {}
 
-// static Future<List<dynamic>> getAllContents() async {
-//   String flag = 'setcontent';
-//   String siteKey = 'secretKey'; //실제 쓰일댄 이렇게 쓰면안됨 파이버 베이스 같은곳에 넣어서 쓰기
-//   Map<String, String> map = Map();
-//   List returnList = [];
-//   map = {"siteKey": '$siteKey', "flag": '$flag'};
-//   try {
-//     var response = await http.post(Uri.parse('${MyWord.ipAndPort}getallcontent'), headers: map);
-//     int stateCode = response.statusCode;
-//     print('$stateCode pass');
-//     if (stateCode == 200) {
-//       Map<dynamic, dynamic> responsePassCheck = jsonDecode(response.body);
-//       if (responsePassCheck.values.elementAt(0).contains('pass')) {
-//         print('pass _ pass');
-//         returnList.add('pass');
-//         List<dynamic> mainDashContent = responsePassCheck.values.elementAt(1);
-//         returnList.add(mainDashContent);
-//       }
-//     } else {
-//       returnList.add('no');
-//     }
-//   } catch (e) {
-//     print('getAllContents err : $e');
-//     returnList.add('err');
-//   }
-//   return returnList;
-// }
-//
   static Future<int> signIn(String id, String pass) async {
     int returnInt = 0;
     String flag = 'signIn';

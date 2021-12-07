@@ -44,8 +44,9 @@ class _ProfileDetailPageState extends State<DetailPageeeeeeeeeeeee> {
   Widget build(BuildContext context) {
     UserContentProvider userContentProvider = Provider.of<UserContentProvider>(context);
     UserProvider userProvider = Provider.of<UserProvider>(context);
+    ContentProvider contentProvider = Provider.of<ContentProvider>(context);
 
-    return Responsive.isLarge(context) ? windows(userContentProvider, userProvider) : mobile();
+    return Responsive.isLarge(context) ? windows(userContentProvider, userProvider, contentProvider) : mobile();
   }
 
   PageController pageController2 = PageController();
@@ -80,18 +81,14 @@ class _ProfileDetailPageState extends State<DetailPageeeeeeeeeeeee> {
     );
   }
 
-  void addComment(String value, UserContentProvider userContentProvider, String userId, ContentDataModel contentData) {
+  void addComment(String value, UserContentProvider userContentProvider, String userId, ContentDataModel contentData, ContentProvider contentProvider) {
+
     if (value == '' && value.isEmpty) {
       value = textEditCommentController.text;
     }
     int index = userContentProvider.contentPageIndex;
-
-    ContentControl.setComment(index: contentData.contentId, value: value, userId: userId).then((value2) => {
-      if (value2) {
-        userContentProvider.setComment(index, value, userId)
-      }
-    });
-
+    contentProvider.setComment(contentIndex: contentData.contentId, comment: value, userId: userId, pageListIndex: index);
+    userContentProvider.setComment(index, value, userId);
 
   }
 
@@ -167,7 +164,7 @@ class _ProfileDetailPageState extends State<DetailPageeeeeeeeeeeee> {
         });
   }
 
-  Widget windows(UserContentProvider userContentProvider, UserProvider userProvider) {
+  Widget windows(UserContentProvider userContentProvider, UserProvider userProvider, ContentProvider contentProvider) {
     print('window apss : ${userContentProvider.userContentDataList.length}');
     List contentDataList = userContentProvider.userContentDataList;
     int index = userContentProvider.contentPageIndex;
@@ -406,7 +403,8 @@ class _ProfileDetailPageState extends State<DetailPageeeeeeeeeeeee> {
                                           controller: textEditCommentController,
                                           focusNode: myFocusNode,
                                           onSubmitted: (v) {
-                                            addComment(v, userContentProvider, userProvider.userId, contentData);
+
+                                            addComment(v, userContentProvider, userProvider.userId, contentData, contentProvider);
                                             textEditCommentController.clear();
                                             myFocusNode.requestFocus();
                                           },
@@ -421,7 +419,7 @@ class _ProfileDetailPageState extends State<DetailPageeeeeeeeeeeee> {
                                           child: IconButton(
                                               onPressed: () {
                                                 print('send pass');
-                                                addComment('', userContentProvider, userProvider.userId, contentData);
+                                                addComment('', userContentProvider, userProvider.userId, contentData, contentProvider);
                                                 textEditCommentController.clear();
                                                 myFocusNode.requestFocus();
                                               },

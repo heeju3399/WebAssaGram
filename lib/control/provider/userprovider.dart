@@ -1,34 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:web/server/nodeserver.dart';
 
 import '../user.dart';
 
 class UserProvider extends ChangeNotifier {
-
-  String userId = 'admin';
+  String userId = 'logIn';
   String googleAccessId = '';
   late GoogleSignInAccount account;
   late GoogleSignInAuthentication auth;
   bool gotProfile = false;
   late GoogleSignIn googleSignIn;
 
-
   late XFile? profileImage;
   bool isProfileImage = false;
 
-
-  void setProfileImage(XFile profileImage){
+  void setProfileImage(XFile profileImage) {
     this.profileImage = profileImage;
-
   }
 
+  void deleteProfileImage() {}
 
-  void deleteProfileImage(){
-
-
+  Future<bool> userWithdrawal(String userId) async {
+    bool returnBool = false;
+    returnBool = await NodeServer.userWithdrawal(userId, googleAccessId);
+    return returnBool;
   }
-
 
   void setUserId(String userId) {
     this.userId = userId;
@@ -36,11 +34,11 @@ class UserProvider extends ChangeNotifier {
   }
 
   void logOut() {
-    try{
+    try {
       userId = 'logIn';
       googleAccessId = '';
       googleSignIn.signOut();
-    }catch(e){
+    } catch (e) {
       print(e);
     }
     notifyListeners();
@@ -67,12 +65,12 @@ class UserProvider extends ChangeNotifier {
       String displayName = account.displayName!.toString();
       String email = account.email.toString();
       String id = account.id.toString();
-      if(id.isNotEmpty){
+      if (id.isNotEmpty) {
         googleAccessId = id;
         bool result2 = await UserControl.googleLogin(email, displayName, id);
-        if(result2){
+        if (result2) {
           userId = displayName;
-        }else{
+        } else {
           result = 2;
         }
       }

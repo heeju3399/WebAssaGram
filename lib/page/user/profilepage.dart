@@ -1,18 +1,13 @@
 import 'dart:convert';
-import 'dart:html';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:ionicons/ionicons.dart';
 import 'package:provider/provider.dart';
 import 'package:web/control/provider/contentprovider.dart';
 import 'package:web/control/provider/homepageprovider.dart';
 import 'package:web/control/provider/usercontentprovider.dart';
 import 'package:web/control/provider/userprovider.dart';
 import 'package:web/model/content.dart';
-import 'package:web/page/dialog/dialog.dart';
-import '../../../responsive.dart';
 import 'detailpageeeeeeeeeeeeeeeee.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -132,9 +127,9 @@ class _ProFileState extends State<ProfilePage> {
   //   );
   // }
 
-  Center windows(UserProvider userProvider, HomePageProvider homePageProvider, UserContentProvider userContentProvider, ContentProvider contentProvider) {
+  Center windows(
+      UserProvider userProvider, HomePageProvider homePageProvider, UserContentProvider userContentProvider, ContentProvider contentProvider) {
     int aa = userContentProvider.userContentDataList.length;
-    print('=================== len : $aa');
 
     return Center(
       child: Column(
@@ -145,7 +140,7 @@ class _ProFileState extends State<ProfilePage> {
             width: 700,
             height: 300,
             //color: Colors.black,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: Colors.black,
               // border: Border.all(
               //   width: 1,
@@ -179,7 +174,7 @@ class _ProFileState extends State<ProfilePage> {
                           label: InkWell(
                         splashColor: Colors.redAccent,
                         onTap: () {
-                          _showSettingAlert('설정', userProvider, homePageProvider, userContentProvider);
+                          _showSettingAlert(contentProvider, '설정', userProvider, homePageProvider, userContentProvider);
                         },
                         child: const Text('설정', style: TextStyle(color: Colors.redAccent, fontSize: 20)),
                       )),
@@ -269,7 +264,6 @@ class _ProFileState extends State<ProfilePage> {
                             //detail page////detail page////detail page//
                           },
                           onLongPress: () {
-
                             _showDeleteAlert(userContentProvider, contentProvider, index, userProvider.userId, contentData.content, contentId);
                           },
                           //child: Image.network(imagesUrlList[0], width: 300, height: 300),
@@ -299,7 +293,7 @@ class _ProFileState extends State<ProfilePage> {
         opaque: false,
         pageBuilder: (context, animation, secondaryAnimation) => page,
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          final begin = Offset(1.0, 0.0);
+          final begin = const Offset(1.0, 0.0);
           final end = Offset.zero;
           final curve = Curves.ease;
           final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
@@ -312,7 +306,8 @@ class _ProFileState extends State<ProfilePage> {
     );
   }
 
-  void _showDeleteAlert(UserContentProvider userContentProvider, ContentProvider contentProvider, int index, String userId, String content, int contentId) {
+  void _showDeleteAlert(
+      UserContentProvider userContentProvider, ContentProvider contentProvider, int index, String userId, String content, int contentId) {
     List<dynamic> utf8List2 = jsonDecode(content);
     List<int> intList = [];
     for (var element in utf8List2) {
@@ -325,23 +320,27 @@ class _ProFileState extends State<ProfilePage> {
         builder: (context) {
           return CupertinoAlertDialog(
             title: const Text('삭제하시겠습니까?'),
-            content: Text('제목 : ${consentString}'),
+            content: Text('제목 : $consentString'),
             insetAnimationCurve: Curves.decelerate,
             insetAnimationDuration: const Duration(seconds: 1),
             actions: [
               CupertinoButton(
-                  child: const Text('게시물 전체 삭제', style: TextStyle(color: Colors.black)),
-                  onPressed: () {
-                    userContentProvider.deleteAllContent(userId);
-                    contentProvider.refresh();
-                    Navigator.pop(context);
-                  }),
+                child: const Text('게시물 전체 삭제', style: TextStyle(color: Colors.black)),
+                onPressed: () {
+                  print('전체 삭제 패쓰');
+                  userContentProvider.deleteAllContent(userId).then((value) {
+                    if (value) {
+                      contentProvider.deleteUserAllContent(userId);
+                      Navigator.pop(context);
+                    }
+                  });
+                },
+              ),
               CupertinoButton(
                   child: const Text('게시물 삭제', style: TextStyle(color: Colors.black)),
                   onPressed: () {
                     userContentProvider.deleteContent(index, userId, contentId);
-                    //contentProvider.deleteMainContent(contentId);
-                    contentProvider.initGetContent();
+                    contentProvider.deleteUserContent(contentId);
                     Navigator.pop(context);
                   }),
               CupertinoDialogAction(
@@ -354,27 +353,51 @@ class _ProFileState extends State<ProfilePage> {
         });
   }
 
-  void _showSettingAlert(String title, UserProvider userProvider, HomePageProvider homePageProvider, UserContentProvider userContentProvider) {
+  void _showSettingAlert(ContentProvider contentProvider, String title, UserProvider userProvider, HomePageProvider homePageProvider,
+      UserContentProvider userContentProvider) {
     showCupertinoDialog(
         context: context,
         builder: (context) {
           return CupertinoAlertDialog(
             title: Text(title),
             insetAnimationCurve: Curves.decelerate,
-            insetAnimationDuration: Duration(seconds: 1),
+            insetAnimationDuration: const Duration(seconds: 1),
             actions: [
               CupertinoButton(
-                  child: Text('로그아웃'),
+                  child: const Text('로그아웃'),
                   onPressed: () {
-                    // userProvider.logOut();
-                    // homePageProvider.pageChange(0);
+                    userProvider.logOut();
+                    homePageProvider.pageChange(0);
                     Navigator.pop(context);
                   }),
-              CupertinoButton(child: Text('게시물 전체 삭제', style: TextStyle(color: Colors.black)), onPressed: () {}),
-              CupertinoButton(child: Text('회원 탈퇴', style: TextStyle(color: Colors.black)), onPressed: () {}),
-              CupertinoButton(child: Text('게시물 1개 삭제는 롱 클릭'), onPressed: () {}),
+              CupertinoButton(
+                  child: const Text('게시물 전체 삭제', style: TextStyle(color: Colors.black)),
+                  onPressed: () {
+                    print('전체 삭제 패쓰');
+                    userContentProvider.deleteAllContent(userProvider.userId).then((value) {
+                      if (value) {
+                        contentProvider.deleteUserAllContent(userProvider.userId);
+                        Navigator.pop(context);
+                      }
+                    });
+                  }),
+              CupertinoButton(
+                  child: const Text('회원 탈퇴', style: TextStyle(color: Colors.black)),
+                  onPressed: () {
+                    userProvider.userWithdrawal(userProvider.userId).then((value) {
+                      if(value){
+                        contentProvider.deleteUserAllContent(userProvider.userId);
+                        userContentProvider.deleteAllContent(userProvider.userId);
+                        userProvider.logOut();
+                        Navigator.pop(context);
+                        homePageProvider.pageChange(0);
+                      }
+
+                    });
+                  }),
+              CupertinoButton(child: const Text('게시물 1개 삭제는 롱 클릭'), onPressed: () {}),
               CupertinoDialogAction(
-                  child: Text("취소"),
+                  child: const Text("취소"),
                   onPressed: () {
                     Navigator.pop(context);
                   }),

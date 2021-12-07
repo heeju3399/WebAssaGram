@@ -1,21 +1,18 @@
-import 'dart:html';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:provider/provider.dart';
-import 'package:web/control/provider/usercontentprovider.dart';
+import 'package:web/control/provider/homepageprovider.dart';
+import 'package:web/control/provider/userprovider.dart';
 import 'package:web/model/darktheme.dart';
 import 'package:web/model/icons.dart';
 import 'package:web/model/mywidget.dart';
 import 'package:web/model/myword.dart';
-import 'package:web/control/provider/homepageprovider.dart';
-import 'package:web/control/provider/userprovider.dart';
-import 'package:web/model/shared.dart';
 import 'package:web/page/user/favoritepage.dart';
 import 'package:web/page/user/profilepage.dart';
 import 'package:web/responsive.dart';
+
 import 'addpage.dart';
 import 'homepage.dart';
 import 'user/signmain.dart';

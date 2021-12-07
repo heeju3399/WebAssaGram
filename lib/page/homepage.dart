@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:html' as html;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -23,7 +24,7 @@ class _HomePageState extends State<HomePage> {
   List<TextEditingController> textCommentEditingController = [];
   List<bool> autoFocus = [];
   List<FocusNode> myFocusNodeList = [];
-  int commentIndex = 0;
+  //int commentIndex = 0;
   String errIdText = '';
   String errPassText = '';
   double downCountPlus = 1.0;
@@ -31,6 +32,7 @@ class _HomePageState extends State<HomePage> {
   final List<PageController> pageController2 = [];
   bool pageIsScrolling = false;
   int listViewLength = 0;
+  bool myIdCheck = false;
 
 
   @override
@@ -49,9 +51,11 @@ class _HomePageState extends State<HomePage> {
       children: [
         Padding(
           padding: const EdgeInsets.all(20.0),
-          child: Container(width: 800, height: 130, color: Colors.grey, child: ElevatedButton(
+          child: Container(width: 300, height: 130, color: Colors.grey, child: ElevatedButton(
             child: Text('data'),onPressed: (){
-
+            setState(() {
+              myIdCheck = !myIdCheck;
+            });
           },
           ),),
         ), //아싸 베스트 프로필
@@ -62,9 +66,9 @@ class _HomePageState extends State<HomePage> {
             child: ListView.builder(
                 itemCount: contentDataList.length,
                 shrinkWrap: true,
-                itemBuilder: (context, index) {
+                itemBuilder: (context, contentIndex) {
                   listViewLength = contentDataList.length;
-                  ContentDataModel contentData = contentDataList[index];
+                  ContentDataModel contentData = contentDataList[contentIndex];
                   String date = contentData.createTime;
                   int contentId = contentData.contentId;
                   int imageListLength = contentData.images.length;
@@ -136,11 +140,11 @@ class _HomePageState extends State<HomePage> {
                                 child: Listener(
                                   onPointerSignal: (pointerSignal) {
                                     if (pointerSignal is PointerScrollEvent) {
-                                      imagesPageScroll(pointerSignal.scrollDelta.dy, index);
+                                      imagesPageScroll(pointerSignal.scrollDelta.dy, contentIndex);
                                     }
                                   },
                                   child: PageView.builder(
-                                    controller: pageController2[index],
+                                    controller: pageController2[contentIndex],
                                     itemCount: imageListLength,
                                     reverse: true,
                                     itemBuilder: (BuildContext context, int pageIndex) {
@@ -167,7 +171,7 @@ class _HomePageState extends State<HomePage> {
                                               print('favo pass');
                                               ContentControl.setLikeAndBad(flag: 0, contentId: contentId, likeAndBad: contentData.likeCount)
                                                   .then((value) => {
-                                                        if (value == 'ok') {providerData.setLikeAndBad(0, index, contentData.likeCount)}
+                                                        if (value == 'ok') {providerData.setLikeAndBad(0, contentIndex, contentData.likeCount)}
                                                       });
                                             },
                                             icon: const Icon(DIcons.favorite),
@@ -180,7 +184,7 @@ class _HomePageState extends State<HomePage> {
                                               print('bad pass');
                                               ContentControl.setLikeAndBad(flag: 1, contentId: contentId, likeAndBad: contentData.badCount)
                                                   .then((value) => {
-                                                        if (value == 'ok') {providerData.setLikeAndBad(1, index, contentData.badCount)}
+                                                        if (value == 'ok') {providerData.setLikeAndBad(1, contentIndex, contentData.badCount)}
                                                       });
                                             },
                                             icon: const Icon(DIcons.emo_unhappy),
@@ -213,12 +217,11 @@ class _HomePageState extends State<HomePage> {
                               height: 230,
                               decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.white), color: Colors.black),
                               child: ListView.builder(
-                                  reverse: true,
                                   itemCount: contentData.comment.length,
                                   shrinkWrap: true,
-                                  itemBuilder: (context, index) {
-                                    commentIndex = index;
-                                    Map element = contentData.comment[index];
+                                  itemBuilder: (context, commentIndex) {
+
+                                    Map element = contentData.comment[commentIndex];
                                     CommentDataModel commentDataModel = CommentDataModel.fromJson(element);
                                     String agoDate = ContentControl.contentTimeStamp(commentDataModel.createTime);
                                     List<dynamic> utf8List2 = jsonDecode(commentDataModel.comment);
@@ -237,16 +240,13 @@ class _HomePageState extends State<HomePage> {
                                                   style: const TextStyle(color: Colors.white, fontSize: 20),
                                                   maxLines: 1,
                                                   overflow: TextOverflow.clip)),
-
-                                          Text(agoDate, style: const TextStyle(color: Colors.white, fontSize: 20)),
-                                          // myIdCheck
-                                          //    ? IconButton(
-                                          //    icon: const Icon(Icons.delete_forever, color: Colors.grey, size: 25),
-                                          //    onPressed: () {
-                                          //      //MainContentControl.deleteComment(contentId: item.contentId, userId: userId, order: order);
-                                          //      //Body.of(context)!.setBool = false;
-                                          //    })
-                                          //    :  Text('$userId'),
+                                          myIdCheck ? Text(agoDate, style: const TextStyle(color: Colors.white, fontSize: 20)) :
+                                          TextButton(onPressed: (){
+                                            print('commentDataModel.commentSeq${commentDataModel.commentSeq}');
+                                            print('commentIndex $commentIndex');
+                                            print('contentIndex $contentIndex');
+                                            providerData.deleteComment(contentId, userId, commentDataModel.commentSeq, commentIndex, contentIndex);
+                                          }, child: const Text('지우기',style: TextStyle(color: Colors.red, fontSize: 20))),
                                         ]));
                                   }),
                               //)
@@ -255,18 +255,16 @@ class _HomePageState extends State<HomePage> {
                                 height: 60,
                                 decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.white), color: Colors.black),
                                 child: TextField(
-                                    focusNode: myFocusNodeList[index],
-                                    controller: textCommentEditingController[index],
+                                    focusNode: myFocusNodeList[contentIndex],
+                                    controller: textCommentEditingController[contentIndex],
                                     onSubmitted: (v) {
                                       if (v != '' && v.isNotEmpty) {
                                         if (userId != MyWord.LOGIN) {
-                                          ContentControl.setComment(index: contentData.contentId, value: v, userId: userId).then((value) => {
-                                                if (value) {providerData.setComment(userId: userId, comment: v, contentIndex: index)}
-                                              });
-                                          textCommentEditingController[index].clear();
-                                          myFocusNodeList[index].requestFocus();
+                                          providerData.setComment(contentIndex: contentData.contentId, comment: v, userId: userId, pageListIndex: contentIndex);
+                                          textCommentEditingController[contentIndex].clear();
+                                          myFocusNodeList[contentIndex].requestFocus();
                                         } else {
-                                          textCommentEditingController[index].clear();
+                                          textCommentEditingController[contentIndex].clear();
                                           MyDialog.setContentDialog(title: '접속불가', message: '로그인 부탁드려요', context: context);
                                         }
                                       }

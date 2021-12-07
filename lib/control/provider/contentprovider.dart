@@ -10,32 +10,109 @@ class ContentProvider extends ChangeNotifier {
 
   List<dynamic> contentDataModelList = [];
   int getContentCountPlus = 5;
-  List<Map> indexContentId = [];
+  List<int> userIndexContentId = [];
   bool firstPass = true;
 
-  // void setIndexContentId(int index, int contentId) {
-  //     Map<int, int> map = {index: contentId};
-  //     indexContentId.add(map);
-  // }
-  //
-  // void viewoksk() {
-  //   print('indexContentId?? $indexContentId');
-  // }
+  void setComment({required int contentIndex, required String comment, required String userId, required int pageListIndex}) async {
+    print('setcomment pass?? $contentIndex // len? ${contentDataModelList.length}');
+    List result = await NodeServer.setComment(userId: userId, index: contentIndex, value: comment);
+    String result2 = result.first;
+    if(result2 == 'pass'){
+      String commentSeq = result.last;
+      commentSeq.trim();
 
-  // void deleteMainContent(int contentId) {
-  //   int aa = 99999;
-  //   for (var map in indexContentId) {
-  //     map.forEach((index, contentIdValue) {
-  //       print('value?!! $index // contentid $contentIdValue');
-  //       if(contentIdValue == contentId){
-  //         aa = index;
-  //         print('이놈이다 $index');
-  //       }
-  //     });
-  //   }
-  //   contentDataModelList.removeAt(aa);
-  //   notifyListeners();
-  // }
+      ContentDataModel contentDataModel = contentDataModelList.elementAt(pageListIndex);
+        List<dynamic> commentDataList = contentDataModel.comment;
+        print('11111 ${commentDataList.length}');
+        List contentEncode = utf8.encode(comment);
+        Map<dynamic, dynamic> map = {
+          'visible': '1',
+          'createTime': DateTime.now().millisecondsSinceEpoch.toString(),
+          'userId': userId,
+          'comment': '$contentEncode',
+          'commentSeq': commentSeq,
+        };
+        commentDataList.insert(0, map);
+        ContentDataModel contentDataModel2 = ContentDataModel(
+            contentId: contentDataModel.contentId,
+            userId: contentDataModel.userId,
+            images: contentDataModel.images,
+            nicName: contentDataModel.nicName,
+            comment: commentDataList,
+            createTime: contentDataModel.createTime,
+            visible: contentDataModel.visible,
+            viewCount: contentDataModel.viewCount,
+            content: contentDataModel.content,
+            likeCount: contentDataModel.likeCount,
+            badCount: contentDataModel.badCount);
+        print('44444');
+        contentDataModelList.removeAt(pageListIndex);
+        contentDataModelList.insert(pageListIndex, contentDataModel2);
+        notifyListeners();
+
+    }else{
+      // 뭔가모를 에러
+    }
+
+  }
+
+  void deleteComment(int contentId, String userId, String commentSeq, int commentIndex, int contentIndex) async {
+    bool result = await NodeServer.deleteComment(contentId, userId, commentSeq);
+    if(result){
+
+      ContentDataModel contentDataModel = contentDataModelList.elementAt(contentIndex);
+      List<dynamic> commentDataList = contentDataModel.comment;
+      commentDataList.removeAt(commentIndex);
+
+      ContentDataModel contentDataModel2 = ContentDataModel(
+          contentId: contentDataModel.contentId,
+          userId: contentDataModel.userId,
+          images: contentDataModel.images,
+          nicName: contentDataModel.nicName,
+          comment: commentDataList,
+          createTime: contentDataModel.createTime,
+          visible: contentDataModel.visible,
+          viewCount: contentDataModel.viewCount,
+          content: contentDataModel.content,
+          likeCount: contentDataModel.likeCount,
+          badCount: contentDataModel.badCount);
+
+      contentDataModelList.removeAt(contentIndex);
+      contentDataModelList.insert(contentIndex, contentDataModel2);
+      notifyListeners();
+
+    }else{
+
+    }
+
+  }
+
+  void repeat(String userId) {
+    for (int i = 0; i < contentDataModelList.length; i++) {
+      ContentDataModel contentDataModel = contentDataModelList.elementAt(i);
+      if (contentDataModel.userId == userId) {
+        contentDataModelList.removeAt(i);
+      }
+    }
+  }
+
+  void deleteUserAllContent(String userId) {
+    for (int i = 0; i < 10; i++) {
+      repeat(userId);
+    }
+    notifyListeners();
+  }
+
+  void deleteUserContent(int contentId) {
+    for (int i = 0; i < contentDataModelList.length; i++) {
+      ContentDataModel contentDataModel = contentDataModelList.elementAt(i);
+      if (contentDataModel.contentId == contentId) {
+        //이때 구하는 i 가 순번
+        contentDataModelList.removeAt(i);
+      }
+    }
+    notifyListeners();
+  }
 
   void initGetContent() async {
     String notApproved = 'not pass';
@@ -52,7 +129,6 @@ class ContentProvider extends ChangeNotifier {
       print('pass');
       contentDataModelList = result;
     }
-
     notifyListeners();
     getContentCountPlus = getContentCountPlus + 5;
   }
@@ -119,43 +195,6 @@ class ContentProvider extends ChangeNotifier {
       contentDataModelList.removeAt(index);
       contentDataModelList.insert(index, contentDataModel2);
     }
-
-    notifyListeners();
-  }
-
-  void setComment({required int contentIndex, required String comment, required String userId}) async {
-    ContentDataModel contentDataModel = contentDataModelList.elementAt(contentIndex);
-    print('0000');
-    List<dynamic> commentDataList = contentDataModel.comment;
-    print('11111 ${commentDataList.length}');
-    List contentEncode = utf8.encode(comment);
-    Map<dynamic, dynamic> map = {
-      'visible': '1',
-      'createTime': DateTime.now().millisecondsSinceEpoch.toString(),
-      'userId': userId,
-      'comment': '$contentEncode',
-      'commentSeq': 9999,
-    };
-
-    CommentDataModel commentDataModel22 = CommentDataModel.fromJson(map);
-    print('22222');
-    commentDataList.insert(0, map);
-    print('33333');
-    ContentDataModel contentDataModel2 = ContentDataModel(
-        contentId: contentDataModel.contentId,
-        userId: contentDataModel.userId,
-        images: contentDataModel.images,
-        nicName: contentDataModel.nicName,
-        comment: commentDataList,
-        createTime: contentDataModel.createTime,
-        visible: contentDataModel.visible,
-        viewCount: contentDataModel.viewCount,
-        content: contentDataModel.content,
-        likeCount: contentDataModel.likeCount,
-        badCount: contentDataModel.badCount);
-    print('44444');
-    contentDataModelList.removeAt(contentIndex);
-    contentDataModelList.insert(contentIndex, contentDataModel2);
 
     notifyListeners();
   }

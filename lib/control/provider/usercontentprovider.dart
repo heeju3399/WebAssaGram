@@ -18,33 +18,47 @@ class UserContentProvider extends ChangeNotifier {
   int badCount = 0;
   int commentCount = 0;
 
-  List<int> homepageMyContentList = [];
-  int homepageMyContentLocation = 0;
-
-  void setMyContentLocation(int flag){
-    homepageMyContentLocation = flag;
-    notifyListeners();
-  }
-
-  void deleteAllContent(String userId) {
-    NodeServer.deleteAllContent(userId).then((value){
+  Future<bool> deleteAllContent(String userId) async {
+    bool returnBool = false;
+    await NodeServer.deleteAllContent(userId).then((value) {
       print('value???????? $value');
-      if(value){//트루??
+      if (value) {
         userContentDataList.clear();
-      }else{
-
+        contentCount = 0;
+        viewCount = 0;
+        likeCount = 0;
+        badCount = 0;
+        commentCount = 0;
+        returnBool = true;
       }
     });
     notifyListeners();
+    return returnBool;
   }
 
   void deleteContent(int index, String userId, int contentId) async {
-    NodeServer.deleteContent(contentId, userId).then((value){
+    await NodeServer.deleteContent(contentId, userId).then((value) {
       print('value???????? $value');
-      if(value){//트루??
-        //userContentDataList.removeAt(index);
-        //html.window.location.reload();
-        //notifyListeners();
+      if (value) {
+        userContentDataList.removeAt(index);
+        int contentCount = 0;
+        int viewCount = 0;
+        int likeCount = 0;
+        int badCount = 0;
+        int commentCount = 0;
+        contentCount = userContentDataList.length;
+        for (ContentDataModel contentData in userContentDataList) {
+          viewCount = contentData.viewCount + viewCount;
+          likeCount = contentData.likeCount + likeCount;
+          badCount = contentData.badCount + badCount;
+          commentCount = contentData.comment.length + commentCount;
+        }
+        this.contentCount = contentCount;
+        this.viewCount = viewCount;
+        this.likeCount = likeCount;
+        this.badCount = badCount;
+        this.commentCount = commentCount;
+        notifyListeners();
       }
     });
   }
@@ -71,6 +85,7 @@ class UserContentProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+
   void setComment(int index, String value, String userId) {
     ContentDataModel contentDataModel = userContentDataList.elementAt(index);
     List<dynamic> commentDataList = contentDataModel.comment;
@@ -80,7 +95,7 @@ class UserContentProvider extends ChangeNotifier {
       'createTime': DateTime.now().millisecondsSinceEpoch.toString(),
       'userId': userId,
       'comment': '$contentEncode',
-      'commentSeq': 0,
+      'commentSeq': 'ok',
     };
 
     commentDataList.insert(0, map);
@@ -148,14 +163,23 @@ class UserContentProvider extends ChangeNotifier {
     } else {
       print('pass');
       userContentDataList = result;
+      int contentCount = 0;
+      int viewCount = 0;
+      int likeCount = 0;
+      int badCount = 0;
+      int commentCount = 0;
       contentCount = userContentDataList.length;
-
       for (ContentDataModel contentData in userContentDataList) {
         viewCount = contentData.viewCount + viewCount;
         likeCount = contentData.likeCount + likeCount;
         badCount = contentData.badCount + badCount;
         commentCount = contentData.comment.length + commentCount;
       }
+      this.contentCount = contentCount;
+      this.viewCount = viewCount;
+      this.likeCount = likeCount;
+      this.badCount = badCount;
+      this.commentCount = commentCount;
     }
     notifyListeners();
   }

@@ -1,23 +1,20 @@
-
-
 import 'package:image_picker/image_picker.dart';
 import 'package:web/control/provider/userprovider.dart';
 import 'package:web/server/nodeserver.dart';
 
 class ContentControl {
-
   static Future<String> setLikeAndBad({required int flag, required int contentId, required int likeAndBad}) async {
     String result = '';
-    bool ss = await NodeServer.setLikeAndBad(contentId: contentId, likeAndBadFlag: flag, likeAndBadCount: likeAndBad );
-    if(ss){
+    bool ss = await NodeServer.setLikeAndBad(contentId: contentId, likeAndBadFlag: flag, likeAndBadCount: likeAndBad);
+    if (ss) {
       result = 'ok';
-    }else{
+    } else {
       result = 'no';
     }
     return result;
   }
 
-  static String contentTimeStamp(String date){
+  static String contentTimeStamp(String date) {
     String resultTime = '';
     int databaseTimeStampInt = int.parse(date);
     var toDay = DateTime.now();
@@ -60,16 +57,16 @@ class ContentControl {
     return resultTime;
   }
 
-  static Future<Map> setContent({required String title,required List<XFile> images, required UserProvider userProvider}) async {
+  static Future<Map> setContent({required String title, required List<XFile> images, required UserProvider userProvider}) async {
     print('setcontent control pass');
     Map resultMap = {};
     bool result = false;
     if (title == '' || title.isEmpty) {
       resultMap = {'title': '타이틀', 'message': '타이틀을 적어주세요'};
-    } else if(images.isEmpty){
+    } else if (images.isEmpty) {
       resultMap = {'title': '사진이 없어요', 'message': '사진을 추가해 주세요'};
     } else {
-      await NodeServer.setContents(images: images,userProvider: userProvider, title: title).then((value) => {result = value});
+      await NodeServer.setContents(images: images, userProvider: userProvider, title: title).then((value) => {result = value});
       if (result) {
         resultMap = {'title': 'pass', 'message': ''};
       } else {
@@ -78,6 +75,7 @@ class ContentControl {
     }
     return resultMap;
   }
+
   //
   // static Future<List<MainContentDataModel>> getUserContents({required String userId}) async {
   //   List response = [];
@@ -115,40 +113,44 @@ class ContentControl {
   //   //returnList = returnList.reversed.toList();
   //   return returnList;
   // }
+
   //
-  static Future<bool> setComment({required String value, required int index,required String userId}) async {
-    bool result = false;
-    await NodeServer.setComment(userId: userId, index: index, value: value).then((value) => {result = value});
-    print('????????????? $result');
-    return result;
-  }
-  //
-  // static void setLikeAndBad({required int flag, required int contentId}) {
-  //   NodeServer.setLikeAndBad(contentId: contentId, likeAndBad: flag).then((value) => {});
-  // }
-  //
-  // static void deleteContent(int contentId, String userId) {
-  //   NodeServer.deleteContent(contentId, userId);
-  // }
-  //
-  // static void deleteAllContent(int contentId, String userId) {
-  //   NodeServer.deleteAllContent(contentId, userId);
-  // }
-  //
-  // static void deleteComment({required int contentId, required String userId, required int order}) async {
-  //   NodeServer.deleteComment(order: order, userId: userId, contentId: contentId); //bool 타입으로 리턴되는데 뭐쓰지?
-  // }
-  //
-  // static void userDelete({required String userId}) async {
-  //   bool check = false;
-  //   await NodeServer.userDelete(userId: userId).then((value) => {
-  //     check = value
-  //   });
-  //   if(check){
-  //     MyShared.setUserId('LogIn');
-  //     html.window.location.reload();
-  //   }else{
-  //
-  //   }
-  // }
+//   static Future<bool> setComment({required String value, required int index, required String userId}) async {
+//
+//     bool result = false;
+//     await NodeServer.setComment(userId: userId, index: index, value: value).then((value) => {result = value});
+//     print('????????????? $result');
+//     return result;
+//   }
+
+// //
+
+// static void setLikeAndBad({required int flag, required int contentId}) {
+//   NodeServer.setLikeAndBad(contentId: contentId, likeAndBad: flag).then((value) => {});
+// }
+//
+// static void deleteContent(int contentId, String userId) {
+//   NodeServer.deleteContent(contentId, userId);
+// }
+//
+// static void deleteAllContent(int contentId, String userId) {
+//   NodeServer.deleteAllContent(contentId, userId);
+// }
+//
+// static void deleteComment({required int contentId, required String userId, required int order}) async {
+//   NodeServer.deleteComment(order: order, userId: userId, contentId: contentId); //bool 타입으로 리턴되는데 뭐쓰지?
+// }
+//
+// static void userDelete({required String userId}) async {
+//   bool check = false;
+//   await NodeServer.userDelete(userId: userId).then((value) => {
+//     check = value
+//   });
+//   if(check){
+//     MyShared.setUserId('LogIn');
+//     html.window.location.reload();
+//   }else{
+//
+//   }
+// }
 }

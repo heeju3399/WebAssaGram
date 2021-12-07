@@ -165,7 +165,11 @@ class _AddPageState extends State<AddPage> {
     //print('============$result ===========');
     if (result.values.elementAt(0) == 'pass') {
       resultBool = true;
+    }else {
+      MyDialog.setContentDialog(title: result.values.elementAt(0), message: result.values.elementAt(1), context: context);
     }
+
+
     return resultBool;
   }
 
