@@ -9,6 +9,7 @@ import 'package:web/model/darktheme.dart';
 import 'package:web/model/icons.dart';
 import 'package:web/model/mywidget.dart';
 import 'package:web/model/myword.dart';
+import 'package:web/page/difprofilepage.dart';
 import 'package:web/page/user/favoritepage.dart';
 import 'package:web/page/user/profilepage.dart';
 import 'package:web/responsive.dart';
@@ -99,6 +100,8 @@ class _MainDashState extends State<MainDash> with SingleTickerProviderStateMixin
       result = const ProfilePage();
     } else if (homePageProvider.pageFlag == 4) {
       result = const LogInMainPage();
+    } else if (homePageProvider.pageFlag == 9) {
+      result = const DifProfilePage();
     }
     return result;
   }
@@ -109,9 +112,11 @@ class _MainDashState extends State<MainDash> with SingleTickerProviderStateMixin
       appBar: AppBar(
         backgroundColor: Colors.white,
         primary: true,
-        title: const Padding(
+        title: Padding(
           padding: EdgeInsets.only(left: 50),
-          child: Text('ASSA_GRAM', style: TextStyle(fontSize: 20, color: Colors.black)),
+          child: InkWell(onTap: (){
+            homePageProvider.pageChange(0);
+          },child: Text('ASSA_GRAM', style: TextStyle(fontSize: 20, color: Colors.black))),
         ),
         actions: [
           const SizedBox(width: 50),
@@ -121,29 +126,29 @@ class _MainDashState extends State<MainDash> with SingleTickerProviderStateMixin
                   ? const Icon(Icons.home_filled, color: Colors.red)
                   : const Icon(Icons.home_outlined, color: Colors.black)),
           const SizedBox(width: 20),
-          if (userId != 'logIn')
+          if (userId != MyWord.LOGIN)
             IconButton(
                 onPressed: () => homePageProvider.pageChange(1),
                 icon: homePageProvider.isMainIconsColor[1]
                     ? const Icon(DIcons.add_circle, color: Colors.red)
                     : const Icon(DIcons.add_circle, color: Colors.black)),
-          if (userId != 'logIn') const SizedBox(width: 20),
-          if (userId != 'logIn')
+          if (userId != MyWord.LOGIN) const SizedBox(width: 20),
+          if (userId != MyWord.LOGIN)
             IconButton(
                 onPressed: () => homePageProvider.pageChange(2),
                 icon: homePageProvider.isMainIconsColor[2]
                     ? const Icon(Icons.favorite, color: Colors.red)
                     : const Icon(Icons.favorite_border, color: Colors.black)),
-          if (userId != 'logIn') const SizedBox(width: 20),
+          if (userId != MyWord.LOGIN) const SizedBox(width: 20),
           //로그인했으면 프로필 버튼!
-          if (userId != 'logIn')
+          if (userId != MyWord.LOGIN)
             TextButton(
                 onPressed: () => homePageProvider.pageChange(3),
                 child: homePageProvider.isMainIconsColor[3]
                     ? Text(userId, maxLines: 1, overflow: TextOverflow.clip, style: const TextStyle(color: Colors.red, fontSize: 15))
                     : Text(userId, maxLines: 1, overflow: TextOverflow.clip, style: const TextStyle(color: Colors.black, fontSize: 15))),
           //안했으면 로그인 버튼!
-          if (userId == 'logIn')
+          if (userId == MyWord.LOGIN)
             IconButton(
                 onPressed: () => homePageProvider.pageChange(4), //로그인 페이지로 이동하기
                 icon: homePageProvider.isMainIconsColor[4]

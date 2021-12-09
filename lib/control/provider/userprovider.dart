@@ -1,20 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:web/model/myword.dart';
 import 'package:web/server/nodeserver.dart';
 
 import '../user.dart';
 
 class UserProvider extends ChangeNotifier {
-  String userId = 'logIn';
+  String userId = MyWord.LOGIN;
   String googleAccessId = '';
   late GoogleSignInAccount account;
   late GoogleSignInAuthentication auth;
   bool gotProfile = false;
   late GoogleSignIn googleSignIn;
+  String visitantId = '';
+  String contentId = '';
+  String profileImageString = '';
 
   late XFile? profileImage;
   bool isProfileImage = false;
+
+  Future<int> signIn(String id, String pass)async{
+    int resultStateCode = 0;
+    List resultList = await NodeServer.signIn(id, pass);
+    if(resultList.elementAt(0) == 1){
+      String imageString = resultList.elementAt(1).toString();
+      profileImageString = MyWord.imagesServerIpAndPort+imageString;
+
+      resultStateCode = 1;
+    }else if(resultList.elementAt(0) == 2){
+      resultStateCode = 2;
+    }else{
+      resultStateCode = 0;
+    }
+    return resultStateCode;
+  }
+
+  void setContentId(String contentId) {
+    this.contentId = contentId;
+  }
+
+  void setVisitantId(String visitantId) {
+    this.visitantId = visitantId;
+  }
 
   void setProfileImage(XFile profileImage) {
     this.profileImage = profileImage;
@@ -35,7 +63,7 @@ class UserProvider extends ChangeNotifier {
 
   void logOut() {
     try {
-      userId = 'logIn';
+      userId = MyWord.LOGIN;
       googleAccessId = '';
       googleSignIn.signOut();
     } catch (e) {

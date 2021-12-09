@@ -1,16 +1,17 @@
 import 'dart:convert';
-import 'dart:html' as html;
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:web/control/content.dart';
+import 'package:web/control/provider/contentprovider.dart';
+import 'package:web/control/provider/homepageprovider.dart';
+import 'package:web/control/provider/userprovider.dart';
 import 'package:web/model/content.dart';
 import 'package:web/model/darktheme.dart';
 import 'package:web/model/icons.dart';
 import 'package:web/model/myword.dart';
-import 'package:web/control/provider/contentprovider.dart';
-import 'package:web/control/provider/homepageprovider.dart';
-import 'package:web/control/provider/userprovider.dart';
+
 import 'dialog/dialog.dart';
 
 class HomePage extends StatefulWidget {
@@ -24,7 +25,6 @@ class _HomePageState extends State<HomePage> {
   List<TextEditingController> textCommentEditingController = [];
   List<bool> autoFocus = [];
   List<FocusNode> myFocusNodeList = [];
-  //int commentIndex = 0;
   String errIdText = '';
   String errPassText = '';
   double downCountPlus = 1.0;
@@ -34,15 +34,15 @@ class _HomePageState extends State<HomePage> {
   int listViewLength = 0;
   bool myIdCheck = false;
 
-
   @override
   Widget build(BuildContext context) {
     UserProvider loginProvider = Provider.of<UserProvider>(context);
     String getProviderUserId = loginProvider.userId.toString();
-    return homePage(context, getProviderUserId);
+
+    return homePage(context, getProviderUserId, loginProvider);
   }
 
-  Widget homePage(BuildContext context, String userId) {
+  Widget homePage(BuildContext context, String userId, UserProvider userProvider) {
     print('home page pass $userId');
     final providerData = Provider.of<ContentProvider>(context);
     final homepageProvider = Provider.of<HomePageProvider>(context);
@@ -50,15 +50,18 @@ class _HomePageState extends State<HomePage> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Container(width: 300, height: 130, color: Colors.grey, child: ElevatedButton(
-            child: Text('data'),onPressed: (){
-            setState(() {
-              myIdCheck = !myIdCheck;
-            });
-          },
-          ),),
-        ), //아싸 베스트 프로필
+            padding: const EdgeInsets.all(20.0),
+            child: Container(
+                width: 300,
+                height: 130,
+                color: Colors.grey,
+                child: ElevatedButton(
+                    child: Text('data'),
+                    onPressed: () {
+                      setState(() {
+                        myIdCheck = !myIdCheck;
+                      });
+                    }))), //아싸 베스트 프로필
         const Divider(),
         Container(
             width: 800,
@@ -81,6 +84,8 @@ class _HomePageState extends State<HomePage> {
                     String urlString = 'http://172.30.1.19:3000/view/$fileName';
                     imagesUrlList.add(urlString);
                   }
+                  List<String> reversList = imagesUrlList.reversed.toList();
+                  imagesUrlList = reversList;
                   pageController2.add(PageController(initialPage: imageListLength, viewportFraction: 0.9)); // pageview 초기화및 몇개넣을지 정하기
                   textEditingController.add(TextEditingController());
                   textCommentEditingController.add(TextEditingController());
@@ -97,8 +102,7 @@ class _HomePageState extends State<HomePage> {
                               color: DisplayControl.mainAppColor,
                             ),
                           ),
-                          child: Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
+                          child: Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, crossAxisAlignment: CrossAxisAlignment.center, children: [
                             SizedBox(
                                 height: 65,
                                 child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
@@ -106,6 +110,11 @@ class _HomePageState extends State<HomePage> {
                                       padding: const EdgeInsets.only(left: 18.0),
                                       child: InkWell(
                                           onTap: () {
+                                            print('profiel pass');
+                                            print('profiel pass ${contentData.userId}');
+                                            print('profiel pass $contentId');
+                                            homepageProvider.pageChange(9);
+                                            userProvider.setContentId(contentData.userId);
 
                                           },
                                           child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
@@ -220,7 +229,6 @@ class _HomePageState extends State<HomePage> {
                                   itemCount: contentData.comment.length,
                                   shrinkWrap: true,
                                   itemBuilder: (context, commentIndex) {
-
                                     Map element = contentData.comment[commentIndex];
                                     CommentDataModel commentDataModel = CommentDataModel.fromJson(element);
                                     String agoDate = ContentControl.contentTimeStamp(commentDataModel.createTime);
@@ -240,13 +248,14 @@ class _HomePageState extends State<HomePage> {
                                                   style: const TextStyle(color: Colors.white, fontSize: 20),
                                                   maxLines: 1,
                                                   overflow: TextOverflow.clip)),
-                                          myIdCheck ? Text(agoDate, style: const TextStyle(color: Colors.white, fontSize: 20)) :
-                                          TextButton(onPressed: (){
-                                            print('commentDataModel.commentSeq${commentDataModel.commentSeq}');
-                                            print('commentIndex $commentIndex');
-                                            print('contentIndex $contentIndex');
-                                            providerData.deleteComment(contentId, userId, commentDataModel.commentSeq, commentIndex, contentIndex);
-                                          }, child: const Text('지우기',style: TextStyle(color: Colors.red, fontSize: 20))),
+                                          myIdCheck
+                                              ? Text(agoDate, style: const TextStyle(color: Colors.white, fontSize: 20))
+                                              : TextButton(
+                                                  onPressed: () {
+                                                    providerData.deleteComment(
+                                                        contentId, userId, commentDataModel.commentSeq, commentIndex, contentIndex);
+                                                  },
+                                                  child: const Text('지우기', style: TextStyle(color: Colors.red, fontSize: 20))),
                                         ]));
                                   }),
                               //)
@@ -260,7 +269,8 @@ class _HomePageState extends State<HomePage> {
                                     onSubmitted: (v) {
                                       if (v != '' && v.isNotEmpty) {
                                         if (userId != MyWord.LOGIN) {
-                                          providerData.setComment(contentIndex: contentData.contentId, comment: v, userId: userId, pageListIndex: contentIndex);
+                                          providerData.setComment(
+                                              contentIndex: contentData.contentId, comment: v, userId: userId, pageListIndex: contentIndex);
                                           textCommentEditingController[contentIndex].clear();
                                           myFocusNodeList[contentIndex].requestFocus();
                                         } else {

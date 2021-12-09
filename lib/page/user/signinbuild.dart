@@ -147,7 +147,7 @@ class _SignInBuildState extends State<SignInBuild> {
       print('===$idPass // $pswPass ============= ');
       if (!idPass && !pswPass) {
         //server call
-        int result = await UserControl.logIn(textFiledIdController.text, textFiledPassController.text);
+        int result = await userProvider.signIn(textFiledIdController.text, textFiledPassController.text);
         //int result = 2;
         if (result == 0) {
           //서버에러

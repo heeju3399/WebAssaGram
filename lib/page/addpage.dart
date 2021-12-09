@@ -96,56 +96,56 @@ class _AddPageState extends State<AddPage> {
         }),
         // 사진란// 사진란// 사진란// 사진란// 사진란// 사진란// 사진란// 사진란
         const SizedBox(height: 50),
-         Container(
-              child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                  onPressed: () {
-                    addImages();
-                  },
-                  style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.blue)),
-                  child: Container(
-                      width: 150,
-                      height: 60,
-                      alignment: Alignment.center,
-                      decoration: const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(20))),
-                      child: const Text('사진추가', style: TextStyle(fontSize: 20)))),
-              ElevatedButton(
-                  onPressed: () {
-                    setState(() {
+        Container(
+            child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            ElevatedButton(
+                onPressed: () {
+                  addImages();
+                },
+                style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.blue)),
+                child: Container(
+                    width: 150,
+                    height: 60,
+                    alignment: Alignment.center,
+                    decoration: const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(20))),
+                    child: const Text('사진추가', style: TextStyle(fontSize: 20)))),
+            ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    imagesList.clear();
+                    imagesFullCount = 0;
+                  });
+                },
+                style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.red)),
+                child: Container(
+                    width: 150,
+                    height: 60,
+                    alignment: Alignment.center,
+                    decoration: const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(20))),
+                    child: const Text('전체삭제', style: TextStyle(fontSize: 20)))),
+            ElevatedButton(
+                onPressed: () {
+                  callSetContentControl(context, userProvider).then((value) {
+                    if (value) {
+                      contentProvider.initGetContent();
                       imagesList.clear();
-                      imagesFullCount = 0;
-                    });
-                  },
-                  style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.red)),
-                  child: Container(
-                      width: 150,
-                      height: 60,
-                      alignment: Alignment.center,
-                      decoration: const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(20))),
-                      child: const Text('전체삭제', style: TextStyle(fontSize: 20)))),
-              ElevatedButton(
-                  onPressed: () {
-                    callSetContentControl(context, userProvider).then((value) {
-                      if (value) {
-                        contentProvider.initGetContent();
-                        imagesList.clear();
-                        textFiledTitleController.clear();
-                        homePageProvider.pageChange(0);
-                      }
-                    });
-                  },
-                  style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.green)),
-                  child: Container(
-                      width: 150,
-                      height: 60,
-                      alignment: Alignment.center,
-                      decoration: const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(20))),
-                      child: const Text('저장', style: TextStyle(fontSize: 20)))),
-            ],
-          )),
+                      textFiledTitleController.clear();
+                      homePageProvider.pageChange(0);
+                    }
+                  });
+                },
+                style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.green)),
+                child: Container(
+                    width: 150,
+                    height: 60,
+                    alignment: Alignment.center,
+                    decoration: const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(20))),
+                    child: const Text('저장', style: TextStyle(fontSize: 20)))),
+          ],
+        )),
 
         const SizedBox(height: 50),
         //사진 추가 버튼
@@ -155,38 +155,73 @@ class _AddPageState extends State<AddPage> {
 
   Future<bool> callSetContentControl(BuildContext context, UserProvider userProvider) async {
     bool resultBool = false;
-    String userId = '';
-    if (userProvider.googleAccessId == '') {
-      userId = userProvider.userId;
-    } else {
-      userId = userProvider.googleAccessId;
-    }
     Map result = await ContentControl.setContent(title: textFiledTitleController.text, userProvider: userProvider, images: imagesList);
-    //print('============$result ===========');
     if (result.values.elementAt(0) == 'pass') {
       resultBool = true;
-    }else {
+    } else {
       MyDialog.setContentDialog(title: result.values.elementAt(0), message: result.values.elementAt(1), context: context);
     }
-
 
     return resultBool;
   }
 
+  // void addImages() async {
+  //   List<XFile>? images = await ImagePicker().pickMultiImage(imageQuality: 500, maxHeight: 500, maxWidth: 500);
+  //   bool imagesFull = false;
+  //   for (var element in images!) {
+  //     if (imagesFullCount < 6) {
+  //       imagesList.add(element);
+  //       imagesFullCount++;
+  //     } else {
+  //       imagesFull = true;
+  //     }
+  //   }
+  //   if (imagesFull) {
+  //     MyDialog.setContentDialog(title: '초과', message: '최대 6개만 등록해주세요!', context: context);
+  //   }
+  //   setState(() {});
+  // }
+
   void addImages() async {
     List<XFile>? images = await ImagePicker().pickMultiImage(imageQuality: 500, maxHeight: 500, maxWidth: 500);
     bool imagesFull = false;
+    bool isKo = false;
+
+    int count = 0;
     for (var element in images!) {
-      if (imagesFullCount < 6) {
-        imagesList.add(element);
-        imagesFullCount++;
+      bool ok = isKorean(element.name);
+      if (ok) {
+        //사진이름을 바꾸어주세요 한글포함됨
+        isKo = true;
       } else {
-        imagesFull = true;
+        if (imagesFullCount < 6) {
+          imagesList.add(element);
+          imagesFullCount++;
+          count--;
+        } else {
+          imagesFull = true;
+        }
       }
+      count++;
+    }
+    if (isKo) {
+      count = imagesList.length + count;
+      MyDialog.setContentDialog(title: '한글이 포함되어 있습니다', message: '사진이름을 변경해 주세요', context: context);
     }
     if (imagesFull) {
       MyDialog.setContentDialog(title: '초과', message: '최대 6개만 등록해주세요!', context: context);
     }
     setState(() {});
+  }
+
+  bool isKorean(String input) {
+    bool isKorean = false;
+    int inputToUniCode = input.codeUnits[0];
+    isKorean = (inputToUniCode >= 12593 && inputToUniCode <= 12643)
+        ? true
+        : (inputToUniCode >= 44032 && inputToUniCode <= 55203)
+            ? true
+            : false;
+    return isKorean;
   }
 }

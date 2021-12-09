@@ -33,10 +33,10 @@ class UserControl {
     return returnBool;
   }
 
-  static Future<int> logIn(String id, String pass) async {
-     int resultStateCode = await NodeServer.signIn(id, pass);
-    return resultStateCode;
-  }
+  // static Future<int> logIn(String id, String pass) async {
+  //    int resultStateCode = await NodeServer.signIn(id, pass);
+  //   return resultStateCode;
+  // }
 
   bool isKorean(String input) {
     bool isKorean = false;

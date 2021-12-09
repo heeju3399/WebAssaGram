@@ -13,53 +13,53 @@ class ContentProvider extends ChangeNotifier {
   List<int> userIndexContentId = [];
   bool firstPass = true;
 
-  void setComment({required int contentIndex, required String comment, required String userId, required int pageListIndex}) async {
+  Future<bool> setComment({required int contentIndex, required String comment, required String userId, required int pageListIndex}) async {
+    bool returnBool = false;
     print('setcomment pass?? $contentIndex // len? ${contentDataModelList.length}');
     List result = await NodeServer.setComment(userId: userId, index: contentIndex, value: comment);
     String result2 = result.first;
-    if(result2 == 'pass'){
+    if (result2 == 'pass') {
       String commentSeq = result.last;
       commentSeq.trim();
 
       ContentDataModel contentDataModel = contentDataModelList.elementAt(pageListIndex);
-        List<dynamic> commentDataList = contentDataModel.comment;
-        print('11111 ${commentDataList.length}');
-        List contentEncode = utf8.encode(comment);
-        Map<dynamic, dynamic> map = {
-          'visible': '1',
-          'createTime': DateTime.now().millisecondsSinceEpoch.toString(),
-          'userId': userId,
-          'comment': '$contentEncode',
-          'commentSeq': commentSeq,
-        };
-        commentDataList.insert(0, map);
-        ContentDataModel contentDataModel2 = ContentDataModel(
-            contentId: contentDataModel.contentId,
-            userId: contentDataModel.userId,
-            images: contentDataModel.images,
-            nicName: contentDataModel.nicName,
-            comment: commentDataList,
-            createTime: contentDataModel.createTime,
-            visible: contentDataModel.visible,
-            viewCount: contentDataModel.viewCount,
-            content: contentDataModel.content,
-            likeCount: contentDataModel.likeCount,
-            badCount: contentDataModel.badCount);
-        print('44444');
-        contentDataModelList.removeAt(pageListIndex);
-        contentDataModelList.insert(pageListIndex, contentDataModel2);
-        notifyListeners();
-
-    }else{
+      List<dynamic> commentDataList = contentDataModel.comment;
+      print('11111 ${commentDataList.length}');
+      List contentEncode = utf8.encode(comment);
+      Map<dynamic, dynamic> map = {
+        'visible': '1',
+        'createTime': DateTime.now().millisecondsSinceEpoch.toString(),
+        'userId': userId,
+        'comment': '$contentEncode',
+        'commentSeq': commentSeq,
+      };
+      commentDataList.insert(0, map);
+      ContentDataModel contentDataModel2 = ContentDataModel(
+          contentId: contentDataModel.contentId,
+          userId: contentDataModel.userId,
+          images: contentDataModel.images,
+          nicName: contentDataModel.nicName,
+          comment: commentDataList,
+          createTime: contentDataModel.createTime,
+          visible: contentDataModel.visible,
+          viewCount: contentDataModel.viewCount,
+          content: contentDataModel.content,
+          likeCount: contentDataModel.likeCount,
+          badCount: contentDataModel.badCount);
+      print('44444');
+      contentDataModelList.removeAt(pageListIndex);
+      contentDataModelList.insert(pageListIndex, contentDataModel2);
+      returnBool = true;
+      notifyListeners();
+    } else {
       // 뭔가모를 에러
     }
-
+    return returnBool;
   }
 
   void deleteComment(int contentId, String userId, String commentSeq, int commentIndex, int contentIndex) async {
     bool result = await NodeServer.deleteComment(contentId, userId, commentSeq);
-    if(result){
-
+    if (result) {
       ContentDataModel contentDataModel = contentDataModelList.elementAt(contentIndex);
       List<dynamic> commentDataList = contentDataModel.comment;
       commentDataList.removeAt(commentIndex);
@@ -80,11 +80,7 @@ class ContentProvider extends ChangeNotifier {
       contentDataModelList.removeAt(contentIndex);
       contentDataModelList.insert(contentIndex, contentDataModel2);
       notifyListeners();
-
-    }else{
-
-    }
-
+    } else {}
   }
 
   void repeat(String userId) {
@@ -128,6 +124,7 @@ class ContentProvider extends ChangeNotifier {
     } else {
       print('pass');
       contentDataModelList = result;
+
     }
     notifyListeners();
     getContentCountPlus = getContentCountPlus + 5;

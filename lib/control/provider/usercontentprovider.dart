@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:html' as html;
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:web/model/content.dart';
 import 'package:web/server/nodeserver.dart';
 
@@ -10,13 +11,28 @@ class UserContentProvider extends ChangeNotifier {
   int contentPageIndex = 0;
   bool upEnd = true;
   bool downEnd = true;
-  String userProfileImage = ''; //아직 비었음
+  String userProfileImageUri = '';
 
   int contentCount = 0;
   int viewCount = 0;
   int likeCount = 0;
   int badCount = 0;
   int commentCount = 0;
+
+  void setProfileImage(String userId, String googleAccessId, XFile image) async {
+    List resultList = await NodeServer.setProfileImage(userId, googleAccessId, image);
+    if(resultList.elementAt(0) == 'true'){
+      String profileImgUrl = resultList.elementAt(1).toString();
+      print('profileImgUrl???????????? $profileImgUrl');
+      userProfileImageUri= 'http://172.30.1.19:3000$profileImgUrl';
+      print('profileImgUrl???????????? $userProfileImageUri');
+      notifyListeners();
+    }else{
+
+    }
+
+
+  }
 
   Future<bool> deleteAllContent(String userId) async {
     bool returnBool = false;

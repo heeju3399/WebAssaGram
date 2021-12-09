@@ -19,6 +19,7 @@ class MyWord {
   // static const String localhostSetCommentServerIp = 'http://172.30.1.19:3000/setcomment';
 
   static const String serverIpAndPort = 'http://172.30.1.19:3000';
+  static const String imagesServerIpAndPort = 'http://172.30.1.19:3000/view/';
 
 
 

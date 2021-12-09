@@ -10,6 +10,8 @@ import 'package:web/control/provider/usercontentprovider.dart';
 import 'package:web/control/provider/userprovider.dart';
 import 'package:web/model/content.dart';
 import 'package:web/model/icons.dart';
+import 'package:web/model/myword.dart';
+import 'package:web/page/dialog/dialog.dart';
 
 import '../../responsive.dart';
 
@@ -81,15 +83,21 @@ class _ProfileDetailPageState extends State<DetailPageeeeeeeeeeeee> {
     );
   }
 
-  void addComment(String value, UserContentProvider userContentProvider, String userId, ContentDataModel contentData, ContentProvider contentProvider) {
-
+  void addComment(
+      String value, UserContentProvider userContentProvider, String userId, ContentDataModel contentData, ContentProvider contentProvider) {
     if (value == '' && value.isEmpty) {
       value = textEditCommentController.text;
     }
-    int index = userContentProvider.contentPageIndex;
-    contentProvider.setComment(contentIndex: contentData.contentId, comment: value, userId: userId, pageListIndex: index);
-    userContentProvider.setComment(index, value, userId);
-
+    
+    if(userId == MyWord.LOGIN){
+      MyDialog.setContentDialog(title: '익명으로는 사용할수 없어요', message: '댓글은 로그인후 이용가능합니다', context: context);
+    }else{
+      int index = userContentProvider.contentPageIndex;
+      contentProvider.setComment(contentIndex: contentData.contentId, comment: value, userId: userId, pageListIndex: index).then((result2) => {
+        if (result2) {userContentProvider.setComment(index, value, userId)}
+      });  
+    }
+    
   }
 
   Widget commentListView(ContentDataModel contentData) {
@@ -275,7 +283,7 @@ class _ProfileDetailPageState extends State<DetailPageeeeeeeeeeeee> {
                                             ),
                                             Expanded(
                                               child: Text(
-                                                userProvider.userId,
+                                                userProvider.contentId,
                                                 textScaleFactor: 2,
                                                 style: TextStyle(color: Colors.black),
                                               ),
@@ -350,12 +358,11 @@ class _ProfileDetailPageState extends State<DetailPageeeeeeeeeeeee> {
                                           child: IconButton(
                                               onPressed: () {
                                                 print('love pass');
-                                                ContentControl.setLikeAndBad(flag: 0, contentId: contentData.contentId, likeAndBad: contentData.likeCount)
+                                                ContentControl.setLikeAndBad(
+                                                        flag: 0, contentId: contentData.contentId, likeAndBad: contentData.likeCount)
                                                     .then((value) => {
-                                                  if (value == 'ok') {
-                                                    userContentProvider.setLike(index, contentData.likeCount)
-                                                  }
-                                                });
+                                                          if (value == 'ok') {userContentProvider.setLike(index, contentData.likeCount)}
+                                                        });
                                                 //userContentProvider.setLike(index, contentData.likeCount);
                                               },
                                               icon: Icon(Icons.favorite_border)),
@@ -403,7 +410,6 @@ class _ProfileDetailPageState extends State<DetailPageeeeeeeeeeeee> {
                                           controller: textEditCommentController,
                                           focusNode: myFocusNode,
                                           onSubmitted: (v) {
-
                                             addComment(v, userContentProvider, userProvider.userId, contentData, contentProvider);
                                             textEditCommentController.clear();
                                             myFocusNode.requestFocus();
