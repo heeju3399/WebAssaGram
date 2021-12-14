@@ -1,28 +1,22 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:provider/provider.dart';
 import 'package:web/control/content.dart';
-import 'package:web/control/provider/contentprovider.dart';
-import 'package:web/control/provider/usercontentprovider.dart';
-import 'package:web/control/provider/userprovider.dart';
+import 'package:web/control/provider/rankerprovider.dart';
 import 'package:web/model/content.dart';
 import 'package:web/model/icons.dart';
-import 'package:web/model/myword.dart';
-import 'package:web/page/dialog/dialog.dart';
-
 import '../../responsive.dart';
 
-class DetailPageeeeeeeeeeeee extends StatefulWidget {
-  const DetailPageeeeeeeeeeeee({Key? key}) : super(key: key);
+class RankerDetailPage extends StatefulWidget {
+  const RankerDetailPage({Key? key}) : super(key: key);
 
   @override
-  _ProfileDetailPageState createState() => _ProfileDetailPageState();
+  _RankerDetailPageState createState() => _RankerDetailPageState();
 }
 
-class _ProfileDetailPageState extends State<DetailPageeeeeeeeeeeee> {
+class _RankerDetailPageState extends State<RankerDetailPage> {
   bool selected = false;
   bool pageIsScrolling = false;
   bool onePass = true;
@@ -44,11 +38,8 @@ class _ProfileDetailPageState extends State<DetailPageeeeeeeeeeeee> {
 
   @override
   Widget build(BuildContext context) {
-    UserContentProvider userContentProvider = Provider.of<UserContentProvider>(context);
-    UserProvider userProvider = Provider.of<UserProvider>(context);
-    ContentProvider contentProvider = Provider.of<ContentProvider>(context);
-
-    return Responsive.isLarge(context) ? windows(userContentProvider, userProvider, contentProvider) : mobile();
+    RankerProvider rankerProvider = Provider.of<RankerProvider>(context);
+    return Responsive.isLarge(context) ? windows(rankerProvider) : mobile();
   }
 
   PageController pageController2 = PageController();
@@ -56,7 +47,6 @@ class _ProfileDetailPageState extends State<DetailPageeeeeeeeeeeee> {
 
   Widget images(ContentDataModel contentData) {
     List imagecontent = contentData.images; //하나의 콘텐트 안에 이미지 겟수
-
     List urlList = [];
     for (var element in imagecontent) {
       ImagesDataModel imagesDataModel = ImagesDataModel.fromJson(element);
@@ -64,6 +54,7 @@ class _ProfileDetailPageState extends State<DetailPageeeeeeeeeeeee> {
       String urlString = 'http://172.30.1.19:3000/view/$fileName';
       urlList.add(urlString);
     }
+
     return PageView.builder(
       itemCount: imagecontent.length,
       controller: pageController2,
@@ -75,22 +66,6 @@ class _ProfileDetailPageState extends State<DetailPageeeeeeeeeeeee> {
                 image: DecorationImage(fit: BoxFit.fill, image: NetworkImage(urlList[index2]))));
       },
     );
-  }
-
-  void addComment(
-      String value, UserContentProvider userContentProvider, String userId, ContentDataModel contentData, ContentProvider contentProvider) {
-    if (value == '' && value.isEmpty) {
-      value = textEditCommentController.text;
-    }
-
-    if (userId == MyWord.LOGIN) {
-      MyDialog.setContentDialog(title: '익명으로는 사용할수 없어요', message: '댓글은 로그인후 이용가능합니다', context: context);
-    } else {
-      int index = userContentProvider.contentPageIndex;
-      contentProvider.setComment(contentIndex: contentData.contentId, comment: value, userId: userId, pageListIndex: index).then((result2) => {
-            if (result2) {userContentProvider.setComment(index, value, userId)}
-          });
-    }
   }
 
   Widget commentListView(ContentDataModel contentData) {
@@ -127,16 +102,6 @@ class _ProfileDetailPageState extends State<DetailPageeeeeeeeeeeee> {
                   ),
                 ],
               ),
-              // child: Padding(
-              //   padding: const EdgeInsets.all(8.0),
-              //   child: Text(
-              //     "ID : ${commentDataModel.userId} \n$commentString ( 작성일 : $agoDate ) ",
-              //     // "ID : NADA \n난알아요 그랑ㄴ머리언라ㅣㄴ머리ㅏㅇ먼랴ㅐㅕ23ㅐ43ㅏㅣ4ㅓ324 ( 작성일 : 444444 ) ",
-              //     overflow: TextOverflow.clip,
-              //     style: TextStyle(color: Colors.white, fontSize: 15),
-              //     textScaleFactor: 1,
-              //   ),
-              // ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -165,13 +130,12 @@ class _ProfileDetailPageState extends State<DetailPageeeeeeeeeeeee> {
         });
   }
 
-  Widget windows(UserContentProvider userContentProvider, UserProvider userProvider, ContentProvider contentProvider) {
-    print('window apss : ${userContentProvider.userContentDataList.length}');
-    List contentDataList = userContentProvider.userContentDataList;
-    int index = userContentProvider.contentPageIndex;
+  Widget windows(RankerProvider rankerProvider) {
+    List contentDataList = rankerProvider.rankerDetailContentList;
+    int index = rankerProvider.detailIndex;
     ContentDataModel contentData = contentDataList[index];
-    String contentId = contentData.userId;
-    String profileImage = profileImageSearch(contentProvider, contentId);
+    List profileImageList = rankerProvider.profileImageListStringUri;
+    String profileImageUri = profileImageList[index];
 
     return Scaffold(
       backgroundColor: Colors.black12.withOpacity(0.8),
@@ -188,7 +152,6 @@ class _ProfileDetailPageState extends State<DetailPageeeeeeeeeeeee> {
               child: AnimatedOpacity(
                 opacity: selected ? 1.0 : 0.0,
                 duration: const Duration(milliseconds: 500),
-                //////////////// all page view //////////////////////////////
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -200,7 +163,6 @@ class _ProfileDetailPageState extends State<DetailPageeeeeeeeeeeee> {
                   ),
                   child: Row(
                     children: [
-                      ////////////////////////////// images ///////////////////////////////
                       Expanded(
                         child: Stack(
                           children: [
@@ -239,8 +201,6 @@ class _ProfileDetailPageState extends State<DetailPageeeeeeeeeeeee> {
                         ),
                         flex: 2,
                       ),
-                      ////////////////////////////// images ///////////////////////////////
-                      ////////////////////////////// comment ///////////////////////////////
                       Expanded(
                         child: Column(
                           children: [
@@ -260,30 +220,37 @@ class _ProfileDetailPageState extends State<DetailPageeeeeeeeeeeee> {
                                         },
                                         child: Row(
                                           children: [
-                                            Flexible(child: Container(width: 10),flex: 1,),
-                                            Flexible(
-                                              flex: 3,
-                                              child: Container(
-                                                  width: 50,
-                                                  height: 50,
-                                                  decoration: BoxDecoration(
-                                                      shape: BoxShape.circle,
-                                                      image: DecorationImage(fit: BoxFit.fill, image: NetworkImage(profileImage)))),
+                                            const SizedBox(width: 10),
+                                            Container(
+                                              width: 50,
+                                              height: 50,
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                image: DecorationImage(
+                                                  fit: BoxFit.fill,
+                                                  image: NetworkImage(profileImageUri),
+                                                ),
+                                              ),
                                             ),
-                                            Flexible(child: Container(width: 10),flex: 1,),
+                                            SizedBox(
+                                              width: 10,
+                                            ),
                                             Expanded(
-                                                child: Text(contentData.userId,
-                                                    maxLines: 1,
-                                                    overflow: TextOverflow.clip,
-                                                    textScaleFactor: 2,
-                                                    style: const TextStyle(color: Colors.black)),flex: 8,
-                                            )
+                                              child: Text(
+                                                contentData.userId,
+                                                textScaleFactor: 2,
+                                                style: TextStyle(color: Colors.black),
+                                              ),
+                                            ),
                                           ],
                                         ),
                                       ),
                                       flex: 1,
                                     ),
-
+                                    Expanded(
+                                      child: Container(),
+                                      flex: 1,
+                                    ),
                                   ],
                                 ),
                               ),
@@ -312,20 +279,8 @@ class _ProfileDetailPageState extends State<DetailPageeeeeeeeeeeee> {
                                   Flexible(
                                     child: Row(
                                       children: [
-                                        Flexible(
-                                          child: IconButton(
-                                              onPressed: () {
-                                                print('love pass');
-                                                ContentControl.setLikeAndBad(
-                                                        flag: 0, contentId: contentData.contentId, likeAndBad: contentData.likeCount)
-                                                    .then((value) => {
-                                                          if (value == 'ok') {userContentProvider.setLike(index, contentData.likeCount)}
-                                                        });
-                                                //userContentProvider.setLike(index, contentData.likeCount);
-                                              },
-                                              icon: Icon(Icons.favorite_border)),
-                                        ),
-                                        Flexible(child: Text('( ${contentData.likeCount} )')),
+                                        const Flexible(child: Icon(Icons.favorite_border)),
+                                        Flexible(child: Text('( ${contentData.likeCount} )'))
                                       ],
                                     ),
                                     flex: 1,
@@ -333,7 +288,7 @@ class _ProfileDetailPageState extends State<DetailPageeeeeeeeeeeee> {
                                   Flexible(
                                     child: Row(
                                       children: [
-                                        Flexible(child: Icon(Icons.message)),
+                                        const Flexible(child: Icon(Icons.message)),
                                         Flexible(child: Text('( ${contentData.comment.length} )')),
                                       ],
                                     ),
@@ -356,45 +311,6 @@ class _ProfileDetailPageState extends State<DetailPageeeeeeeeeeeee> {
                             Divider(
                               height: 1,
                             ),
-                            /////////////////////////// 33333333333333/ /////////////////////////
-                            /////////////////////////// 444444444444444/ /////////////////////////
-                            Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Row(children: [
-                                  Expanded(
-                                      flex: 9,
-                                      child: TextField(
-                                          controller: textEditCommentController,
-                                          focusNode: myFocusNode,
-                                          onSubmitted: (v) {
-                                            addComment(v, userContentProvider, userProvider.userId, contentData, contentProvider);
-                                            textEditCommentController.clear();
-                                            myFocusNode.requestFocus();
-                                          },
-                                          style: const TextStyle(fontSize: 20),
-                                          decoration: InputDecoration(
-                                            labelText: '댓글',
-                                            labelStyle: const TextStyle(fontSize: 15),
-                                          ))),
-                                  Expanded(
-                                      flex: 1,
-                                      child: Container(
-                                          child: IconButton(
-                                              onPressed: () {
-                                                print('send pass');
-                                                addComment('', userContentProvider, userProvider.userId, contentData, contentProvider);
-                                                textEditCommentController.clear();
-                                                myFocusNode.requestFocus();
-                                              },
-                                              icon: Icon(
-                                                Icons.send,
-                                              )))),
-                                ]),
-                              ),
-                              flex: 10,
-                            ),
-                            /////////////////////////// 44444444444444/ /////////////////////////
                           ],
                         ),
                         flex: 1,
@@ -418,39 +334,7 @@ class _ProfileDetailPageState extends State<DetailPageeeeeeeeeeeee> {
                     child: AnimatedOpacity(
                         opacity: selected ? 1.0 : 0.0,
                         duration: const Duration(milliseconds: 500),
-                        child: const Icon(Icons.cancel, color: Colors.red, size: 60)))),
-            AnimatedPositioned(
-                right: selected ? 10 : 0,
-                top: selected ? 420 : 0,
-                duration: const Duration(seconds: 1),
-                curve: Curves.fastOutSlowIn,
-                child: GestureDetector(
-                    onTap: () {
-                      print('!!!!!!!!!!!!');
-                      userContentProvider.changePageUp();
-                      //pageController2.nextPage(duration: const Duration(milliseconds: 200), curve: Curves.easeInOut);
-                      // main_page_right();
-                    },
-                    child: AnimatedOpacity(
-                        opacity: selected ? 1.0 : 0.0,
-                        duration: const Duration(milliseconds: 500),
-                        child: const Icon(Ionicons.arrow_forward_circle_sharp, color: Colors.grey, size: 40)))),
-            AnimatedPositioned(
-                left: selected ? 10 : 0,
-                top: selected ? 420 : 0,
-                duration: const Duration(seconds: 1),
-                curve: Curves.fastOutSlowIn,
-                child: GestureDetector(
-                    onTap: () {
-                      print('@@@@@@@@@@@@@');
-                      //pageController2.previousPage(duration: const Duration(milliseconds: 200), curve: Curves.easeInOut);
-                      //main_page_left();
-                      userContentProvider.changePageDown();
-                    },
-                    child: AnimatedOpacity(
-                        opacity: selected ? 1.0 : 0.0,
-                        duration: const Duration(milliseconds: 500),
-                        child: const Icon(Ionicons.arrow_back_circle_sharp, color: Colors.grey, size: 40)))),
+                        child: const Icon(Icons.cancel, color: Colors.red, size: 60))))
           ])),
     );
   }
@@ -471,27 +355,5 @@ class _ProfileDetailPageState extends State<DetailPageeeeeeeeeeeee> {
       });
       Navigator.of(context).pop();
     }
-  }
-
-  String profileImageSearch(ContentProvider contentProvider, String userId) {
-    String returnString = '';
-    List ssd = contentProvider.profileImage;
-
-    for (var element in ssd) {
-      String userid5 = element['userId'];
-      if (userId == userid5) {
-        Map map = element['images'];
-        String imgString = map.values.elementAt(5).toString();
-        returnString = 'http://172.30.1.19:3000/view/$imgString';
-        break;
-      } else {
-        returnString = '';
-      }
-    }
-    print('profile?? !!!!!!!!!!!!!!!!!! $returnString ');
-    if (returnString == '') {
-      returnString = 'http://172.30.1.19:3000/view/basic.png';
-    }
-    return returnString;
   }
 }

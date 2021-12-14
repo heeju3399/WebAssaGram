@@ -83,10 +83,6 @@ class _LogInMainPageState extends State<LogInMainPage> {
     ]));
   }
 
-
-
-
-
   void callGoogleApiAccess(UserProvider userProvider, HomePageProvider homepageProvider) async {
     int result = await userProvider.googleLogin();
     if (result == 0) {

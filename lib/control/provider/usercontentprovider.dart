@@ -1,37 +1,76 @@
 import 'dart:convert';
-import 'dart:html' as html;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:web/model/content.dart';
 import 'package:web/server/nodeserver.dart';
 
+import 'contentprovider.dart';
+
 class UserContentProvider extends ChangeNotifier {
   List<dynamic> userContentDataList = [];
-  int getContentCountPlus = 100;
-  int contentPageIndex = 0;
-  bool upEnd = true;
+  List profileImage = [];
+
   bool downEnd = true;
+  bool upEnd = true;
+  bool init = true;
+
   String userProfileImageUri = '';
 
+  int getContentCountPlus = 100;
+  int contentPageIndex = 0;
   int contentCount = 0;
+  int commentCount = 0;
   int viewCount = 0;
   int likeCount = 0;
   int badCount = 0;
-  int commentCount = 0;
 
-  void setProfileImage(String userId, String googleAccessId, XFile image) async {
-    List resultList = await NodeServer.setProfileImage(userId, googleAccessId, image);
-    if(resultList.elementAt(0) == 'true'){
-      String profileImgUrl = resultList.elementAt(1).toString();
-      print('profileImgUrl???????????? $profileImgUrl');
-      userProfileImageUri= 'http://172.30.1.19:3000$profileImgUrl';
-      print('profileImgUrl???????????? $userProfileImageUri');
-      notifyListeners();
+  void initProfileImage(ContentProvider contentProvider, String userId) {
+    if(init){
+      print('initProfileImage');
+      String imgString = '';
+      List profileImageList = contentProvider.profileImage;
+      for (var element in profileImageList) {
+        String userid5 = element['userId'];
+        if (userId == userid5) {
+          Map map = element['images'];
+          imgString = map.values.elementAt(5).toString();
+          userProfileImageUri = 'http://172.30.1.19:3000/view/$imgString';
+          break;
+        } else {
+          userProfileImageUri = '';
+        }
+      }
+      print('profile?? !!!!!!!!!!!!!!!!!! $userProfileImageUri ');
+      if (userProfileImageUri == '') {
+        userProfileImageUri = 'http://172.30.1.19:3000/view/basic.png';
+      }
+      init = false;
+    }
+  }
+
+  Future<bool> deleteProfileImage(String userId, String googleAccessId) async {
+    bool returnBool = false;
+    bool result = await NodeServer.deleteProfileImage(userId, googleAccessId);
+    if(result){
+      userProfileImageUri = '';
+      returnBool = true;
     }else{
 
     }
+    notifyListeners();
+    return returnBool;
 
+  }
 
+  void setProfileImage(String userId, String googleAccessId, XFile image) async {
+    List resultList = await NodeServer.setProfileImage(userId, googleAccessId, image);
+    if (resultList.elementAt(0) == 'true') {
+      String profileImgUrl = resultList.elementAt(1).toString();
+      print('profileImgUrl???????????? $profileImgUrl');
+      userProfileImageUri = 'http://172.30.1.19:3000$profileImgUrl';
+      print('profileImgUrl???????????? $userProfileImageUri');
+      notifyListeners();
+    } else {}
   }
 
   Future<bool> deleteAllContent(String userId) async {
@@ -100,7 +139,6 @@ class UserContentProvider extends ChangeNotifier {
 
     notifyListeners();
   }
-
 
   void setComment(int index, String value, String userId) {
     ContentDataModel contentDataModel = userContentDataList.elementAt(index);

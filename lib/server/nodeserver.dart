@@ -11,6 +11,118 @@ import 'package:web/model/myword.dart';
 // ignore_for_file: avoid_print
 class NodeServer {
 
+  static Future<List> getTenRankerProfileAndContent(int getRankerContentCountPlus) async {
+    List<dynamic> returnList = [];
+
+    print('getContent pass');
+    String flag = 'getTenRankerContents';
+    String siteKey = 'secretKey';
+    String url = MyWord.serverIpAndPort + '/gettenrankercontents';
+    Map<String, String> map = {};
+    map = {"sitekey": siteKey, "flag": flag, "skipindex": '$getRankerContentCountPlus'};
+    Uri uri = Uri.parse(url);
+    try {
+      var response = await http.post(uri, headers: map);
+      int state = response.statusCode;
+      print(response.statusCode);
+      if (state == 200) {
+        Map result = jsonDecode(response.body);
+        print(result);
+        String approved = result.values.elementAt(0);
+        List message = result.values.elementAt(1);
+        List imgProfile = result.values.elementAt(2);
+        print('=============================');
+        print(approved);
+        if (approved == 'pass') {
+          returnList.add(message);
+          returnList.add(imgProfile);
+        } else {
+          returnList.add('not pass');
+        }
+      } else {
+        returnList.add('state err');
+      }
+    } catch (e) {
+      returnList.add('server connect fail');
+    }
+    return returnList;
+  }
+
+  static Future<List> getRankerProfileAndContentInit(int getRankerContentCountPlus) async {
+    List<dynamic> returnList = [];
+
+    print('getContent pass');
+    String flag = 'getRankerContents';
+    String siteKey = 'secretKey';
+    String url = MyWord.serverIpAndPort + '/getrankercontents';
+    Map<String, String> map = {};
+    map = {"sitekey": siteKey, "flag": flag, "getrankercontentcountplus": '$getRankerContentCountPlus'};
+    Uri uri = Uri.parse(url);
+    try {
+      var response = await http.post(uri, headers: map);
+      int state = response.statusCode;
+      print(response.statusCode);
+      if (state == 200) {
+        Map result = jsonDecode(response.body);
+        //print(result);
+        String approved = result.values.elementAt(0);
+        List message = result.values.elementAt(1);
+        List imgProfile = result.values.elementAt(2);
+        print('=============================');
+        //print(approved);
+        if (approved == 'pass') {
+          returnList.add(message);
+          // for (Map<dynamic, dynamic> element1 in message) {
+          //   ContentDataModel contentDataModel = ContentDataModel.fromJson(element1);
+          //   returnList.add(contentDataModel);
+          // }
+          returnList.add(imgProfile);
+        } else {
+          returnList.add('not pass');
+        }
+      } else {
+        returnList.add('state err');
+      }
+    } catch (e) {
+      returnList.add('server connect fail');
+    }
+    return returnList;
+  }
+
+
+  static Future<bool> deleteProfileImage(String userId, String googleAccessId) async {
+    String flag = 'deleteProfile';
+    String siteKey = 'secretKey';
+    String url = MyWord.serverIpAndPort + '/deleteprofile';
+    bool returnResult = false;
+    Map<String, String> map = {};
+    String id = '';
+    if (userId == '') {
+      id = googleAccessId;
+    } else {
+      id = userId;
+    }
+    map = {"siteKey": siteKey, "flag": flag, "id": id};
+    try {
+      var response = await http.post(Uri.parse(url), headers: map);
+      int stateCode = response.statusCode;
+      print('$stateCode pass');
+      if (stateCode == 200) {
+        Map responseValue = jsonDecode(response.body);
+        if (responseValue.values.first.contains('pass')) {
+          returnResult = true;
+        } else if (responseValue.values.first.contains('no')) {
+          returnResult = false;
+        }
+      }
+    } catch (e) {
+      print('deleteProfile error :$e');
+      returnResult = false;
+    }
+    return returnResult;
+
+  }
+
   static Future<List> setProfileImage(String userId, String googleAccessId, XFile image) async {
     List returnBool = [];
 
@@ -55,7 +167,7 @@ class NodeServer {
         } else {
           returnBool.add('false');
         }
-      }else{
+      } else {
         returnBool.add('false');
       }
     } catch (e) {
@@ -169,6 +281,7 @@ class NodeServer {
         //print(result);
         String approved = result.values.elementAt(0);
         List message = result.values.elementAt(1);
+
         print('=============================');
         print(approved);
         if (approved == 'pass') {
@@ -176,6 +289,7 @@ class NodeServer {
             ContentDataModel contentDataModel = ContentDataModel.fromJson(element1);
             returnList.add(contentDataModel);
           }
+
         } else {
           returnList.add('not pass');
         }
@@ -206,6 +320,7 @@ class NodeServer {
         //print(result);
         String approved = result.values.elementAt(0);
         List message = result.values.elementAt(1);
+        List imgProfile = result.values.elementAt(2);
         print('=============================');
         //print(approved);
         if (approved == 'pass') {
@@ -213,6 +328,7 @@ class NodeServer {
             ContentDataModel contentDataModel = ContentDataModel.fromJson(element1);
             returnList.add(contentDataModel);
           }
+          returnList.add(imgProfile);
         } else {
           returnList.add('not pass');
         }

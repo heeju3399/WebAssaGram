@@ -131,16 +131,14 @@ class _ProFileState extends State<ProfilePage> {
   //   );
   // }
 
+
+
   Center windows(
       UserProvider userProvider, HomePageProvider homePageProvider, UserContentProvider userContentProvider, ContentProvider contentProvider) {
     String profileImage = '';
-    if (userContentProvider.userProfileImageUri != '') {
-      //프사 변경때만 채워짐
-      profileImage = userContentProvider.userProfileImageUri;
-    } else if (userProvider.profileImageString != '') {
-      //로그인시 채워짐
-      profileImage = userProvider.profileImageString;
-    }
+    userContentProvider.initProfileImage(contentProvider, userProvider.userId);
+    profileImage = userContentProvider.userProfileImageUri;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -149,7 +147,6 @@ class _ProFileState extends State<ProfilePage> {
           Container(
             width: 700,
             height: 300,
-
             decoration: const BoxDecoration(
               color: Colors.black,
             ),
@@ -178,7 +175,7 @@ class _ProFileState extends State<ProfilePage> {
                     child: InkWell(
                       onTap: () {
                         print('profile image call');
-                        //_showProfileAlert('프로필 사진 변경', userProvider, homePageProvider, userContentProvider);
+                        _showProfileAlert('프로필 사진 변경', userProvider, homePageProvider, userContentProvider);
                       },
                       child: Container(
                           width: 190.0,
@@ -251,49 +248,40 @@ class _ProFileState extends State<ProfilePage> {
                     int imageListLength = contentData.images.length;
                     print('-----------------CONTENT DATA LEN $imageListLength) ================ ');
                     List<String> imagesUrlList = [];
-                    List<String> imageName = [];
 
                     for (var contentDataImages in contentData.images) {
-                      //사진 url 편집
                       ImagesDataModel imagesDataModel = ImagesDataModel.fromJson(contentDataImages);
                       String fileName = imagesDataModel.filename;
                       print('name?? ${imagesDataModel.filename}');
                       print('name?? ${imagesDataModel.originalName}');
                       print('name?? ${imagesDataModel.destination}');
-
                       String urlString = 'http://172.30.1.19:3000/view/$fileName';
                       imagesUrlList.add(urlString);
                     }
-                    int gridviewcount = 1;
-                    if (imageListLength == 1) {
-                      gridviewcount = 1;
-                    } else if (imageListLength == 2) {
-                      gridviewcount = 2;
-                    } else if (imageListLength >= 3) {
-                      gridviewcount = 3;
-                    }
-                    print('??????????? $gridviewcount');
-
+                    // int gridviewcount = 1;
+                    // if (imageListLength == 1) {
+                    //   gridviewcount = 1;
+                    // } else if (imageListLength == 2) {
+                    //   gridviewcount = 2;
+                    // } else if (imageListLength >= 3) {
+                    //   gridviewcount = 3;
+                    // }
                     return Padding(
                       padding: const EdgeInsets.all(18.0),
                       child: Container(
                         child: InkWell(
                           onTap: () {
                             print('몇번째일까? $index');
-                            //detail page////detail page////detail page//
                             userContentProvider.setPage(index);
                             navigatorPush(context, const DetailPageeeeeeeeeeeee());
-                            //detail page////detail page////detail page//
                           },
                           onLongPress: () {
                             _showDeleteAlert(userContentProvider, contentProvider, index, userProvider.userId, contentData.content, contentId);
                           },
-                          //child: Image.network(imagesUrlList[0], width: 300, height: 300),
                           child: Container(
                               decoration: BoxDecoration(
                                   shape: BoxShape.rectangle, image: DecorationImage(fit: BoxFit.fill, image: NetworkImage(imagesUrlList[0])))),
-//               //Image.network(provider.image.path),
-//               //if (provider.images != null)
+
                         ),
                       ),
                     );
@@ -434,17 +422,21 @@ class _ProFileState extends State<ProfilePage> {
           return CupertinoAlertDialog(
             title: Text(title),
             insetAnimationCurve: Curves.decelerate,
-            insetAnimationDuration: Duration(seconds: 1),
+            insetAnimationDuration: const Duration(seconds: 1),
             actions: [
               CupertinoButton(
-                  child: Text('프로필 사진 변경'),
+                  child: const Text('프로필 사진 변경'),
                   onPressed: () {
                     addImages(userProvider, homePageProvider, userContentProvider).then((value) => {
                           if (value) {Navigator.pop(context)}
                         });
                   }),
-              CupertinoButton(child: Text('프로필 사진 삭제', style: TextStyle(color: Colors.red)), onPressed: () {}),
-              CupertinoDialogAction(child: Text("취소"), onPressed: () => Navigator.pop(context)),
+              CupertinoButton(child: const Text('프로필 사진 삭제', style: TextStyle(color: Colors.red)), onPressed: () {
+                userContentProvider.deleteProfileImage(userProvider.userId, userProvider.googleAccessId).then((value) => {
+                  Navigator.pop(context)
+                });
+              }),
+              CupertinoDialogAction(child: const Text("취소"), onPressed: () => Navigator.pop(context)),
             ],
           );
         });

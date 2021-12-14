@@ -15,22 +15,46 @@ class UserProvider extends ChangeNotifier {
   late GoogleSignIn googleSignIn;
   String visitantId = '';
   String contentId = '';
-  String profileImageString = '';
+  String myProfileImageString = '';
+  String difProfileImageString = '';
+  List profileImageList = [];
 
   late XFile? profileImage;
   bool isProfileImage = false;
 
-  Future<int> signIn(String id, String pass)async{
+  void setProfileImagesList(List images) {
+    profileImageList = images;
+  }
+
+  void setDifProfileImageStringUri(String imgString) {
+    difProfileImageString = imgString;
+  }
+
+  String getProfileImage() {
+    String returnString = '';
+    try {
+      Map ss = profileImageList.firstWhere((e) => e['userId'] == userId);
+      Map sss = ss['images'];
+      String profileImageName = sss['filename'].toString();
+      myProfileImageString = 'http://172.30.1.19:3000/view/' + profileImageName;
+      returnString = myProfileImageString;
+    } catch (e) {
+      print('err $e');
+    }
+    return returnString;
+    //print(myProfileImageString);
+  }
+
+  Future<int> signIn(String id, String pass) async {
     int resultStateCode = 0;
     List resultList = await NodeServer.signIn(id, pass);
-    if(resultList.elementAt(0) == 1){
+    if (resultList.elementAt(0) == 1) {
       String imageString = resultList.elementAt(1).toString();
-      profileImageString = MyWord.imagesServerIpAndPort+imageString;
-
+      userId = id;
       resultStateCode = 1;
-    }else if(resultList.elementAt(0) == 2){
+    } else if (resultList.elementAt(0) == 2) {
       resultStateCode = 2;
-    }else{
+    } else {
       resultStateCode = 0;
     }
     return resultStateCode;
@@ -85,14 +109,30 @@ class UserProvider extends ChangeNotifier {
     );
     try {
       account = (await googleSignIn.signIn())!;
+      await googleSignIn.signInSilently();
+      account = googleSignIn.currentUser!;
+      print(account.toString());
+      auth = await account.authentication;
+      print(auth.toString());
+      var result7 = auth.accessToken;
+      print(result7);
+      print('======================================');
+
       result = 1;
     } catch (e) {
       print(e.toString());
     }
     if (result == 1) {
+
       String displayName = account.displayName!.toString();
       String email = account.email.toString();
       String id = account.id.toString();
+      print('=============================');
+      print('display name : ' + displayName);
+      print('email : ' + email);
+      print('id : 4521622343325723414678');
+      print(account.photoUrl);
+      print(account.authHeaders);
       if (id.isNotEmpty) {
         googleAccessId = id;
         bool result2 = await UserControl.googleLogin(email, displayName, id);

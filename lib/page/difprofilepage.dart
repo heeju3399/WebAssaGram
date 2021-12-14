@@ -127,13 +127,9 @@ class _DifProfilePageState extends State<DifProfilePage> {
       UserProvider userProvider, HomePageProvider homePageProvider, UserContentProvider userContentProvider, ContentProvider contentProvider) {
 
     String profileImage = '';
-    if (userContentProvider.userProfileImageUri != '') {
-      //프사 변경때만 채워짐
-      profileImage = userContentProvider.userProfileImageUri;
-    } else if (userProvider.profileImageString != '') {
-      //로그인시 채워짐
-      profileImage = userProvider.profileImageString;
-    }
+    profileImage = userProvider.difProfileImageString;
+    //print('BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB $profileImage');
+
 
     return Center(
       child: Column(

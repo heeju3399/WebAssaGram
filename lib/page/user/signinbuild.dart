@@ -115,20 +115,20 @@ class _SignInBuildState extends State<SignInBuild> {
     ]);
   }
 
-  void callGoogleApiAccess(UserProvider userProvider, HomePageProvider homepageProvider) async {
-    int result = await userProvider.googleLogin();
-    if (result == 0) {
-      //로그인이 안된것
-      print('뭐지? $result');
-    } else if (result == 1) {
-      //pass
-      homepageProvider.pageChange(0);
-    } else if (result == 2) {
-      print('뭐지? $result');
-      //서버에서 팅긴것
-      MyDialog.setContentDialog(title: '응답이 없습니다.', message: '관리자에게 문의 바랍니다.', context: context);
-    }
-  }
+  // void callGoogleApiAccess(UserProvider userProvider, HomePageProvider homepageProvider) async {
+  //   int result = await userProvider.googleLogin();
+  //   if (result == 0) {
+  //     //로그인이 안된것
+  //     print('뭐지? $result');
+  //   } else if (result == 1) {
+  //     //pass
+  //     homepageProvider.pageChange(0);
+  //   } else if (result == 2) {
+  //     print('뭐지? $result');
+  //     //서버에서 팅긴것
+  //     MyDialog.setContentDialog(title: '응답이 없습니다.', message: '관리자에게 문의 바랍니다.', context: context);
+  //   }
+  // }
 
   void returnErrString(UserProvider userProvider, HomePageProvider homePageProvider) async {
     String resultId = '';

@@ -10,7 +10,7 @@ import 'package:web/model/icons.dart';
 import 'package:web/model/mywidget.dart';
 import 'package:web/model/myword.dart';
 import 'package:web/page/difprofilepage.dart';
-import 'package:web/page/user/favoritepage.dart';
+import 'package:web/page/ranker/rankerpage.dart';
 import 'package:web/page/user/profilepage.dart';
 import 'package:web/responsive.dart';
 
@@ -95,7 +95,7 @@ class _MainDashState extends State<MainDash> with SingleTickerProviderStateMixin
       result = const AddPage();
     } else if (homePageProvider.pageFlag == 2) {
       //result = favoritePage(context, userId);
-      result = const FavoritePage();
+      result = const RankerPage();
     } else if (homePageProvider.pageFlag == 3) {
       result = const ProfilePage();
     } else if (homePageProvider.pageFlag == 4) {
@@ -133,13 +133,12 @@ class _MainDashState extends State<MainDash> with SingleTickerProviderStateMixin
                     ? const Icon(DIcons.add_circle, color: Colors.red)
                     : const Icon(DIcons.add_circle, color: Colors.black)),
           if (userId != MyWord.LOGIN) const SizedBox(width: 20),
-          if (userId != MyWord.LOGIN)
             IconButton(
                 onPressed: () => homePageProvider.pageChange(2),
                 icon: homePageProvider.isMainIconsColor[2]
                     ? const Icon(Icons.favorite, color: Colors.red)
                     : const Icon(Icons.favorite_border, color: Colors.black)),
-          if (userId != MyWord.LOGIN) const SizedBox(width: 20),
+          const SizedBox(width: 20),
           //로그인했으면 프로필 버튼!
           if (userId != MyWord.LOGIN)
             TextButton(
