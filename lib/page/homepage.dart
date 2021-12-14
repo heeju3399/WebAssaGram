@@ -1,21 +1,18 @@
 import 'dart:convert';
-import 'dart:math';
-
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:web/control/content.dart';
 import 'package:web/control/provider/contentprovider.dart';
 import 'package:web/control/provider/homepageprovider.dart';
-import 'package:web/control/provider/rankerprovider.dart';
 import 'package:web/control/provider/userprovider.dart';
 import 'package:web/model/content.dart';
 import 'package:web/model/darktheme.dart';
 import 'package:web/model/icons.dart';
 import 'package:web/model/myword.dart';
-
 import 'dialog/dialog.dart';
 
+// ignore_for_file: avoid_print
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -25,43 +22,33 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<TextEditingController> textCommentEditingController = [];
-  List<bool> autoFocus = [];
   List<FocusNode> myFocusNodeList = [];
-  String errIdText = '';
-  String errPassText = '';
   double downCountPlus = 1.0;
   List<TextEditingController> textEditingController = [];
   final List<PageController> pageController2 = [];
   bool pageIsScrolling = false;
   int listViewLength = 0;
   bool myIdCheck = false;
-  bool isProfileImage = false;
 
   @override
   Widget build(BuildContext context) {
     UserProvider loginProvider = Provider.of<UserProvider>(context);
     String getProviderUserId = loginProvider.userId.toString();
-
     return homePage(context, getProviderUserId, loginProvider);
   }
 
   String redefine(ContentProvider contentProvider, ContentDataModel contentData) {
     String returnProfileString = 'http://172.30.1.19:3000/view/basic.png';
-    //리스트뷰에서 온 아이디를 참고로 재 정의 해서 주면 되자나?
-    // 하나의 컨텐트 아이디와 프사의 컨텐트 아이디가 맞을 경우 그아이디의 프사 스트링을 전송
     String imgString = '';
     List profileImageList = contentProvider.profileImage;
     for (var element in profileImageList) {
-      //print(element);
       String userid5 = element['userId'];
       if (contentData.userId == userid5) {
-        //print('맞다?');
         Map map = element['images'];
         imgString = map.values.elementAt(5).toString();
         returnProfileString = 'http://172.30.1.19:3000/view/$imgString';
         break;
       } else {
-        //print('아니다!!');
         returnProfileString = 'http://172.30.1.19:3000/view/basic.png';
       }
     }
@@ -77,38 +64,7 @@ class _HomePageState extends State<HomePage> {
 
     return Column(
       children: [
-        Padding(padding: EdgeInsets.all(20)),
-        // Padding(
-        //   padding: const EdgeInsets.all(20.0),
-        //   child: Container(
-        //     width: 800,
-        //     height: 100,
-        //     alignment: Alignment.center,
-        //     decoration: BoxDecoration(
-        //       border: Border.all(color: Colors.white),
-        //     ),
-        //     child: ListView.builder(
-        //         itemCount: 6,
-        //         scrollDirection: Axis.horizontal,
-        //         shrinkWrap: true,
-        //         itemBuilder: (context, index2) {
-        //       return Padding(
-        //         padding: const EdgeInsets.only(top: 8, bottom: 8, left: 20, right: 20),
-        //         child: InkWell(
-        //           onTap: (){
-        //
-        //           },
-        //           child: Container(
-        //               width: 80,
-        //               height: 80,
-        //               decoration: BoxDecoration(
-        //                   shape: BoxShape.circle,
-        //                   image: DecorationImage(fit: BoxFit.fill, image: NetworkImage('http://172.30.1.19:3000/view/basic.png')))),
-        //         ),
-        //       );
-        //     }),
-        //   ),
-        // ), //아싸 베스트 프로필
+        const Padding(padding: EdgeInsets.all(20)),
         const Divider(),
         Container(
             width: 800,
@@ -123,11 +79,9 @@ class _HomePageState extends State<HomePage> {
                   int contentId = contentData.contentId;
                   int imageListLength = contentData.images.length;
                   List<String> imagesUrlList = [];
-
                   String profileImageUri = '';
                   profileImageUri = redefine(contentProvider, contentData);
                   for (var contentDataImages in contentData.images) {
-                    //사진 url 편집
                     ImagesDataModel imagesDataModel = ImagesDataModel.fromJson(contentDataImages);
                     String fileName = imagesDataModel.filename;
                     String urlString = 'http://172.30.1.19:3000/view/$fileName';
@@ -146,10 +100,7 @@ class _HomePageState extends State<HomePage> {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: const BorderRadius.all(Radius.circular(1)),
-                            border: Border.all(
-                              width: 1,
-                              color: DisplayControl.mainAppColor,
-                            ),
+                            border: Border.all(width: 1, color: DisplayControl.mainAppColor),
                           ),
                           child: Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, crossAxisAlignment: CrossAxisAlignment.center, children: [
                             SizedBox(
@@ -232,7 +183,7 @@ class _HomePageState extends State<HomePage> {
                                             icon: const Icon(DIcons.favorite),
                                             iconSize: 25,
                                             color: Colors.white),
-                                        RichText(text: TextSpan(text: '${contentData.likeCount}', style: TextStyle(color: Colors.white))),
+                                        RichText(text: TextSpan(text: '${contentData.likeCount}', style:const TextStyle(color: Colors.white))),
                                         const SizedBox(width: 25),
                                         IconButton(
                                             onPressed: () {
@@ -245,7 +196,7 @@ class _HomePageState extends State<HomePage> {
                                             icon: const Icon(DIcons.emo_unhappy),
                                             iconSize: 25,
                                             color: Colors.white),
-                                        RichText(text: TextSpan(text: '${contentData.badCount}', style: TextStyle(color: Colors.white))),
+                                        RichText(text: TextSpan(text: '${contentData.badCount}', style:const TextStyle(color: Colors.white))),
                                         const SizedBox(width: 25),
                                         IconButton(
                                             mouseCursor: SystemMouseCursors.basic,
@@ -253,16 +204,15 @@ class _HomePageState extends State<HomePage> {
                                             icon: const Icon(DIcons.remove_red_eye),
                                             iconSize: 25,
                                             color: Colors.white),
-                                        RichText(text: TextSpan(text: '${contentData.viewCount}', style: TextStyle(color: Colors.white))),
+                                        RichText(text: TextSpan(text: '${contentData.viewCount}', style:const TextStyle(color: Colors.white))),
                                       ],
                                     ),
                                     Row(
                                       children: [
-                                        RichText(text: TextSpan(text: ContentControl.contentTimeStamp(date), style: TextStyle(color: Colors.white))),
+                                        RichText(text: TextSpan(text: ContentControl.contentTimeStamp(date), style:const TextStyle(color: Colors.white))),
                                         const SizedBox(width: 20),
                                       ],
                                     )
-                                    //좋아요 싫어요 뷰수 넣기!! 생성날짜는 몇일전 이렇게 !!
                                   ],
                                 ),
                               ),
@@ -278,10 +228,9 @@ class _HomePageState extends State<HomePage> {
                                     Map element = contentData.comment[commentIndex];
                                     CommentDataModel commentDataModel = CommentDataModel.fromJson(element);
                                     String agoDate = ContentControl.contentTimeStamp(commentDataModel.createTime);
-                                    //myIdCheck
-                                    if(userId == commentDataModel.userId){
+                                    if (userId == commentDataModel.userId) {
                                       myIdCheck = false;
-                                    }else{
+                                    } else {
                                       myIdCheck = true;
                                     }
                                     List<dynamic> utf8List2 = jsonDecode(commentDataModel.comment);
@@ -359,17 +308,13 @@ class _HomePageState extends State<HomePage> {
                   MyDialog.setContentDialog(title: 'LAST', message: '글작성 부탁드려요', context: context);
                 }
               },
-              child: const Text('더보기',
-                  style: TextStyle(color: Colors.white),
-                  textScaleFactor:
-                      2), //Container(width: 500,height: 200,child: Text('5개 더보기....아',style: TextStyle(color: Colors.white),textScaleFactor: 3,),),
-            )) //아싸 베스트
+              child: const Text('더보기', style: TextStyle(color: Colors.white), textScaleFactor: 2),
+            ))
       ],
     );
   }
 
   void imagesPageScroll(double offset, int index) {
-    //print(offset);
     if (pageIsScrolling == false) {
       pageIsScrolling = true;
       if (offset > 0) {

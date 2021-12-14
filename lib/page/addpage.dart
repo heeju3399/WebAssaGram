@@ -7,6 +7,7 @@ import 'package:web/control/provider/homepageprovider.dart';
 import 'package:web/control/provider/userprovider.dart';
 import 'dialog/dialog.dart';
 
+// ignore_for_file: avoid_print
 class AddPage extends StatefulWidget {
   const AddPage({Key? key}) : super(key: key);
 
@@ -46,8 +47,6 @@ class _AddPageState extends State<AddPage> {
                     enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(10.0)), borderSide: BorderSide(width: 1, color: Colors.redAccent)),
                     border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10.0)))))), //제목
-
-        //////////////// add picture ////////////////////////
         const SizedBox(height: 30),
         Consumer<ContentProvider>(builder: (context, provider, child) {
           print('provider build pass!!');
@@ -59,15 +58,10 @@ class _AddPageState extends State<AddPage> {
                   itemCount: imagesList.length, //item 개수
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 3, //1 개의 행에 보여줄 item 개수
-                    //childAspectRatio: 1 / 2, //item 의 가로 1, 세로 2 의 비율
-                    // mainAxisSpacing: 10, //수평 Padding
-                    // crossAxisSpacing: 10, //수직 Padding
                   ),
                   itemBuilder: (BuildContext context, int index) {
                     print('grid build pass!! ');
                     XFile imgFile = imagesList.elementAt(index);
-                    //print('***********************************!! ${imgFile.path}');
-                    //item 의 반목문 항목 형성
                     return InkWell(
                       onLongPress: () {
                         print('pass : $index');
@@ -76,28 +70,17 @@ class _AddPageState extends State<AddPage> {
                           imagesFullCount--;
                         });
                       },
-                      child: Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Image.network(imgFile.path),
-//               //Image.network(provider.image.path),
-//               //if (provider.images != null)
-                      ),
+                      child: Padding(padding: const EdgeInsets.all(10.0), child: Image.network(imgFile.path)),
                     );
                   }),
             );
           } else {
             return const Center(
-              child: SizedBox(
-                height: 100,
-                child: Text('길게 누르면 지워집니다.', textScaleFactor: 2, style: TextStyle(color: Colors.white)),
-              ),
-            );
+                child: SizedBox(height: 100, child: Text('길게 누르면 지워집니다.', textScaleFactor: 2, style: TextStyle(color: Colors.white))));
           }
         }),
-        // 사진란// 사진란// 사진란// 사진란// 사진란// 사진란// 사진란// 사진란
         const SizedBox(height: 50),
-        Container(
-            child: Row(
+        Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -145,10 +128,8 @@ class _AddPageState extends State<AddPage> {
                     decoration: const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(20))),
                     child: const Text('저장', style: TextStyle(fontSize: 20)))),
           ],
-        )),
-
+        ),
         const SizedBox(height: 50),
-        //사진 추가 버튼
       ],
     );
   }
@@ -161,26 +142,8 @@ class _AddPageState extends State<AddPage> {
     } else {
       MyDialog.setContentDialog(title: result.values.elementAt(0), message: result.values.elementAt(1), context: context);
     }
-
     return resultBool;
   }
-
-  // void addImages() async {
-  //   List<XFile>? images = await ImagePicker().pickMultiImage(imageQuality: 500, maxHeight: 500, maxWidth: 500);
-  //   bool imagesFull = false;
-  //   for (var element in images!) {
-  //     if (imagesFullCount < 6) {
-  //       imagesList.add(element);
-  //       imagesFullCount++;
-  //     } else {
-  //       imagesFull = true;
-  //     }
-  //   }
-  //   if (imagesFull) {
-  //     MyDialog.setContentDialog(title: '초과', message: '최대 6개만 등록해주세요!', context: context);
-  //   }
-  //   setState(() {});
-  // }
 
   void addImages() async {
     List<XFile>? images = await ImagePicker().pickMultiImage(imageQuality: 500, maxHeight: 500, maxWidth: 500);
@@ -191,7 +154,6 @@ class _AddPageState extends State<AddPage> {
     for (var element in images!) {
       bool ok = isKorean(element.name);
       if (ok) {
-        //사진이름을 바꾸어주세요 한글포함됨
         isKo = true;
       } else {
         if (imagesFullCount < 6) {

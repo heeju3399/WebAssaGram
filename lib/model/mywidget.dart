@@ -23,8 +23,6 @@ class MyWidget {
     Colors.red,
   ];
 
-
-
   static Text myTextWhite(String value){
     return Text(value, style: const TextStyle(color: Colors.white));
   }
@@ -32,7 +30,5 @@ class MyWidget {
   static Text myTextBlack(String value){
     return Text(value, style: const TextStyle(color: Colors.black));
   }
-
-
 
 }

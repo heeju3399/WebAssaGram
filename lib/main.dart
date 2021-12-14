@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:web/page/maindash.dart';
 import 'package:web/page/splash/splash.dart';
-import 'control/provider/addpageprovider.dart';
 import 'control/provider/contentprovider.dart';
 import 'control/provider/homepageprovider.dart';
 import 'control/provider/rankerprovider.dart';
@@ -26,7 +25,6 @@ class MyApp extends StatelessWidget {
         } else {
           return MultiProvider(providers: [
             ChangeNotifierProvider<ContentProvider>(create: (BuildContext context) => ContentProvider()),
-            ChangeNotifierProvider<AddPageProvider>(create: (BuildContext context) => AddPageProvider()),
             ChangeNotifierProvider<HomePageProvider>(create: (BuildContext context) => HomePageProvider()),
             ChangeNotifierProvider<UserProvider>(create: (BuildContext context) => UserProvider()),
             ChangeNotifierProvider<UserContentProvider>(create: (BuildContext context) => UserContentProvider()),

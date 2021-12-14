@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 
 class HomePageProvider extends ChangeNotifier {
-
-  List<bool> toggle = [false,false,false,false,false];
+  List<bool> toggle = [false, false, false, false, false];
   double downCountPlus = 1.0;
 
   bool save = false;
@@ -25,36 +24,31 @@ class HomePageProvider extends ChangeNotifier {
         isMainIconsColor[i] = false;
       }
     }
-    if(flag == 0){
+    if (flag == 0) {
       isFloating = true;
-    }else{
+    } else {
       isFloating = false;
     }
     notifyListeners();
   }
 
-  void setDownCountPlus (){
+  void setDownCountPlus() {
     downCountPlus = downCountPlus + 1.0;
     notifyListeners();
   }
 
-
-  void setToggle(int index){
+  void setToggle(int index) {
     toggle[index] = true;
     notifyListeners();
   }
 
-  void boolTure(){
+  void boolTure() {
     save = true;
     notifyListeners();
   }
 
-  void boolFalse(){
+  void boolFalse() {
     save = false;
     notifyListeners();
   }
-
-
-
-
 }

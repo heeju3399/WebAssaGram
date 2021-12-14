@@ -3,9 +3,9 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:web/model/myword.dart';
 import 'package:web/server/nodeserver.dart';
-
 import '../user.dart';
 
+// ignore_for_file: avoid_print
 class UserProvider extends ChangeNotifier {
   String userId = MyWord.LOGIN;
   String googleAccessId = '';
@@ -42,14 +42,12 @@ class UserProvider extends ChangeNotifier {
       print('err $e');
     }
     return returnString;
-    //print(myProfileImageString);
   }
 
   Future<int> signIn(String id, String pass) async {
     int resultStateCode = 0;
     List resultList = await NodeServer.signIn(id, pass);
     if (resultList.elementAt(0) == 1) {
-      String imageString = resultList.elementAt(1).toString();
       userId = id;
       resultStateCode = 1;
     } else if (resultList.elementAt(0) == 2) {
@@ -111,28 +109,14 @@ class UserProvider extends ChangeNotifier {
       account = (await googleSignIn.signIn())!;
       await googleSignIn.signInSilently();
       account = googleSignIn.currentUser!;
-      print(account.toString());
-      auth = await account.authentication;
-      print(auth.toString());
-      var result7 = auth.accessToken;
-      print(result7);
-      print('======================================');
-
       result = 1;
     } catch (e) {
       print(e.toString());
     }
     if (result == 1) {
-
       String displayName = account.displayName!.toString();
       String email = account.email.toString();
       String id = account.id.toString();
-      print('=============================');
-      print('display name : ' + displayName);
-      print('email : ' + email);
-      print('id : 4521622343325723414678');
-      print(account.photoUrl);
-      print(account.authHeaders);
       if (id.isNotEmpty) {
         googleAccessId = id;
         bool result2 = await UserControl.googleLogin(email, displayName, id);
@@ -143,11 +127,6 @@ class UserProvider extends ChangeNotifier {
         }
       }
     }
-    //pass 되었다 치고
-    // String email = 'oksk@gmail.com';
-    // String displayName = 'okok9990';
-    // String id = '321321231321321';
-    //result = await UserControl.googleLogin(email, displayName, id);
     return result;
   }
 }

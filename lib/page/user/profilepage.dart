@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -11,9 +10,9 @@ import 'package:web/control/provider/usercontentprovider.dart';
 import 'package:web/control/provider/userprovider.dart';
 import 'package:web/model/content.dart';
 import 'package:web/page/dialog/dialog.dart';
+import 'package:web/page/user/profiledetailpage.dart';
 
-import 'detailpageeeeeeeeeeeeeeeee.dart';
-
+// ignore_for_file: avoid_print
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
 
@@ -131,8 +130,6 @@ class _ProFileState extends State<ProfilePage> {
   //   );
   // }
 
-
-
   Center windows(
       UserProvider userProvider, HomePageProvider homePageProvider, UserContentProvider userContentProvider, ContentProvider contentProvider) {
     String profileImage = '';
@@ -161,10 +158,10 @@ class _ProFileState extends State<ProfilePage> {
                             print('profile image call');
                             _showProfileAlert('프로필 사진 변경', userProvider, homePageProvider, userContentProvider);
                           },
-                          child: Container(
+                          child: const SizedBox(
                               width: 190.0,
                               height: 190.0,
-                              child: const Icon(
+                              child: Icon(
                                 Ionicons.person_add_outline,
                                 color: Colors.white,
                                 size: 80,
@@ -201,96 +198,70 @@ class _ProFileState extends State<ProfilePage> {
                     rows: <DataRow>[
                       DataRow(
                         cells: <DataCell>[
-                          DataCell(Text('게시물 (${userContentProvider.contentCount})', style: TextStyle(color: Colors.white, fontSize: 20))),
-                          DataCell(Text('조회수 (${userContentProvider.viewCount})', style: TextStyle(color: Colors.white, fontSize: 20))),
+                          DataCell(Text('게시물 (${userContentProvider.contentCount})', style: const TextStyle(color: Colors.white, fontSize: 20))),
+                          DataCell(Text('조회수 (${userContentProvider.viewCount})', style: const TextStyle(color: Colors.white, fontSize: 20))),
                         ],
                       ),
                       DataRow(
                         cells: <DataCell>[
-                          DataCell(Text('좋아요 (${userContentProvider.likeCount})', style: TextStyle(color: Colors.white, fontSize: 20))),
-                          DataCell(Text('댓글수 (${userContentProvider.commentCount})', style: TextStyle(color: Colors.white, fontSize: 20))),
+                          DataCell(Text('좋아요 (${userContentProvider.likeCount})', style: const TextStyle(color: Colors.white, fontSize: 20))),
+                          DataCell(Text('댓글수 (${userContentProvider.commentCount})', style: const TextStyle(color: Colors.white, fontSize: 20))),
                         ],
                       ),
                       DataRow(
                         cells: <DataCell>[
-                          DataCell(Text('시러요 (${userContentProvider.badCount})', style: TextStyle(color: Colors.white, fontSize: 20))),
-                          DataCell(Text('', style: TextStyle(color: Colors.white, fontSize: 20))),
+                          DataCell(Text('시러요 (${userContentProvider.badCount})', style: const TextStyle(color: Colors.white, fontSize: 20))),
+                          const DataCell(Text('', style: TextStyle(color: Colors.white, fontSize: 20))),
                         ],
                       ),
                     ],
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(20),
                   child: Container(),
                 ),
               ],
             ),
           ),
           Center(
-            child: SizedBox(
-              width: 750,
-              child: GridView.builder(
-                  shrinkWrap: true,
-                  itemCount: userContentProvider.userContentDataList.length, //item 개수
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3, //1 개의 행에 보여줄 item 개수
-                    //childAspectRatio: 0.6, //item 의 가로 1, 세로 2 의 비율
-                    // mainAxisSpacing: 10, //수평 Padding
-                    // crossAxisSpacing: 10, //수직 Padding
-                  ),
-                  itemBuilder: (BuildContext context, int index) {
-                    List userContentList = userContentProvider.userContentDataList;
-                    listViewLength = userContentList.length;
-                    ContentDataModel contentData = userContentList[index];
-                    String date = contentData.createTime;
-                    int contentId = contentData.contentId;
-                    int imageListLength = contentData.images.length;
-                    print('-----------------CONTENT DATA LEN $imageListLength) ================ ');
-                    List<String> imagesUrlList = [];
-
-                    for (var contentDataImages in contentData.images) {
-                      ImagesDataModel imagesDataModel = ImagesDataModel.fromJson(contentDataImages);
-                      String fileName = imagesDataModel.filename;
-                      print('name?? ${imagesDataModel.filename}');
-                      print('name?? ${imagesDataModel.originalName}');
-                      print('name?? ${imagesDataModel.destination}');
-                      String urlString = 'http://172.30.1.19:3000/view/$fileName';
-                      imagesUrlList.add(urlString);
-                    }
-                    // int gridviewcount = 1;
-                    // if (imageListLength == 1) {
-                    //   gridviewcount = 1;
-                    // } else if (imageListLength == 2) {
-                    //   gridviewcount = 2;
-                    // } else if (imageListLength >= 3) {
-                    //   gridviewcount = 3;
-                    // }
-                    return Padding(
-                      padding: const EdgeInsets.all(18.0),
-                      child: Container(
-                        child: InkWell(
-                          onTap: () {
-                            print('몇번째일까? $index');
-                            userContentProvider.setPage(index);
-                            navigatorPush(context, const DetailPageeeeeeeeeeeee());
-                          },
-                          onLongPress: () {
-                            _showDeleteAlert(userContentProvider, contentProvider, index, userProvider.userId, contentData.content, contentId);
-                          },
-                          child: Container(
-                              decoration: BoxDecoration(
-                                  shape: BoxShape.rectangle, image: DecorationImage(fit: BoxFit.fill, image: NetworkImage(imagesUrlList[0])))),
-
-                        ),
+              child: SizedBox(
+                  width: 750,
+                  child: GridView.builder(
+                      shrinkWrap: true,
+                      itemCount: userContentProvider.userContentDataList.length, //item 개수
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
                       ),
-                    );
-                  }),
-            ),
-          ),
-          SizedBox(
-            height: 100,
-          )
+                      itemBuilder: (BuildContext context, int index) {
+                        List userContentList = userContentProvider.userContentDataList;
+                        listViewLength = userContentList.length;
+                        ContentDataModel contentData = userContentList[index];
+                        int contentId = contentData.contentId;
+                        List<String> imagesUrlList = [];
+                        for (var contentDataImages in contentData.images) {
+                          ImagesDataModel imagesDataModel = ImagesDataModel.fromJson(contentDataImages);
+                          String fileName = imagesDataModel.filename;
+                          String urlString = 'http://172.30.1.19:3000/view/$fileName';
+                          imagesUrlList.add(urlString);
+                        }
+                        return Padding(
+                            padding: const EdgeInsets.all(18.0),
+                            child: InkWell(
+                                onTap: () {
+                                  userContentProvider.setPage(index);
+                                  navigatorPush(context, const ProfileDetailPage());
+                                },
+                                onLongPress: () {
+                                  _showDeleteAlert(
+                                      userContentProvider, contentProvider, index, userProvider.userId, contentData.content, contentId);
+                                },
+                                child: Container(
+                                    decoration: BoxDecoration(
+                                        shape: BoxShape.rectangle,
+                                        image: DecorationImage(fit: BoxFit.fill, image: NetworkImage(imagesUrlList[0]))))));
+                      }))),
+          const SizedBox(height: 100)
         ],
       ),
     );
@@ -303,7 +274,7 @@ class _ProFileState extends State<ProfilePage> {
         opaque: false,
         pageBuilder: (context, animation, secondaryAnimation) => page,
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          final begin = const Offset(1.0, 0.0);
+          const begin = Offset(1.0, 0.0);
           final end = Offset.zero;
           final curve = Curves.ease;
           final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
@@ -357,7 +328,7 @@ class _ProFileState extends State<ProfilePage> {
                   child: const Text("취소"),
                   onPressed: () {
                     Navigator.pop(context);
-                  }),
+                  })
             ],
           );
         });
@@ -431,11 +402,13 @@ class _ProFileState extends State<ProfilePage> {
                           if (value) {Navigator.pop(context)}
                         });
                   }),
-              CupertinoButton(child: const Text('프로필 사진 삭제', style: TextStyle(color: Colors.red)), onPressed: () {
-                userContentProvider.deleteProfileImage(userProvider.userId, userProvider.googleAccessId).then((value) => {
-                  Navigator.pop(context)
-                });
-              }),
+              CupertinoButton(
+                  child: const Text('프로필 사진 삭제', style: TextStyle(color: Colors.red)),
+                  onPressed: () {
+                    userContentProvider
+                        .deleteProfileImage(userProvider.userId, userProvider.googleAccessId)
+                        .then((value) => {Navigator.pop(context)});
+                  }),
               CupertinoDialogAction(child: const Text("취소"), onPressed: () => Navigator.pop(context)),
             ],
           );
@@ -447,7 +420,6 @@ class _ProFileState extends State<ProfilePage> {
     XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
     bool ok = isKorean(image!.name);
     if (ok) {
-      //사진이름을 바꾸어주세요 한글포함됨
       MyDialog.setContentDialog(title: '한글이 포함되어 있습니다', message: '사진이름을 변경해 주세요', context: context);
     } else {
       userContentProvider.setProfileImage(userProvider.userId, userProvider.googleAccessId, image);

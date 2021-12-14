@@ -3,19 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:web/model/content.dart';
 import 'package:web/server/nodeserver.dart';
 
+// ignore_for_file: avoid_print
 class ContentProvider extends ChangeNotifier {
   ContentProvider() {
     initGetContent();
   }
-
   List<dynamic> contentDataModelList = [];
   int getContentCountPlus = 5;
   List<int> userIndexContentId = [];
   List profileImage = [];
   List bestProfileList = [];
-
   bool firstPass = true;
-
 
   Future<bool> setComment({required int contentIndex, required String comment, required String userId, required int pageListIndex}) async {
     bool returnBool = false;
@@ -114,33 +112,6 @@ class ContentProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void reBestProfileList(){
-
-    /*
-    * 1. like 값을 배교한뒤 가장 높은것 가져오기...
-    * 2. 아 이건 서버에서 갈겨야 하는데....
-    *
-    * */
-
-    // for (var value in profileImage) {
-    //   print('333333333333333 $value');
-    //   String userid5 = value['userId'];
-    //   if (userId == userid5) {
-    //     Map map = value['images'];
-    //     imgString = map.values.elementAt(5).toString();
-    //     userProfileImageUri = 'http://172.30.1.19:3000/view/$imgString';
-    //     break;
-    //   } else {
-    //     userProfileImageUri = '';
-    //   }
-    // }
-
-
-    //bestProfileList 여기로 넣어주기 image string uri
-    //bestUserIdList this is userid add !!
-    // e같이
-  }
-
   void initGetContent() async {
     String notApproved = 'not pass';
     String stateErr = 'state err';
@@ -159,16 +130,10 @@ class ContentProvider extends ChangeNotifier {
         profileImage = [];
       }else{
         profileImage = result.last;
-
-        //bestProfileList 여기로 넣어주기 image string uri
-        //bestUserIdList this is userid add !!
-        // e같이
       }
-      //print('77777777777777777777777777 $profileImage');
       List contentData = result.getRange(0, resultLen -1 ).toList();
       contentDataModelList = contentData;
     }
-
     notifyListeners();
     getContentCountPlus = getContentCountPlus + 5;
   }
@@ -186,22 +151,13 @@ class ContentProvider extends ChangeNotifier {
     } else if (result.contains(serverConnectFail)) {
       print(serverConnectFail);
     } else {
-      //
-      // print('pass');
-      // print('77777777777777777777777777 $result');
-      // contentDataModelList = result;
       print('pass');
       int resultLen = result.length;
       if(result.last == []){
         profileImage = [];
       }else{
         profileImage = result.last;
-
-        //bestProfileList 여기로 넣어주기 image string uri
-        //bestUserIdList this is userid add !!
-        // e같이
       }
-      //print('77777777777777777777777777 $profileImage');
       List contentData = result.getRange(0, resultLen -1 ).toList();
       contentDataModelList = contentData;
     }
@@ -217,8 +173,6 @@ class ContentProvider extends ChangeNotifier {
     likeAndBadCount = likeAndBadCount + 1;
     ContentDataModel contentDataModel = contentDataModelList.elementAt(index);
     if (flag == 0) {
-      //like
-      //print('like pass');
       ContentDataModel contentDataModel2 = ContentDataModel(
           contentId: contentDataModel.contentId,
           userId: contentDataModel.userId,
@@ -234,8 +188,6 @@ class ContentProvider extends ChangeNotifier {
       contentDataModelList.removeAt(index);
       contentDataModelList.insert(index, contentDataModel2);
     } else {
-      //bad
-      //print('bad pass');
       ContentDataModel contentDataModel2 = ContentDataModel(
           contentId: contentDataModel.contentId,
           userId: contentDataModel.userId,
@@ -251,7 +203,6 @@ class ContentProvider extends ChangeNotifier {
       contentDataModelList.removeAt(index);
       contentDataModelList.insert(index, contentDataModel2);
     }
-
     notifyListeners();
   }
 }

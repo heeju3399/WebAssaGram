@@ -9,6 +9,7 @@ import 'package:web/model/content.dart';
 import 'package:web/model/icons.dart';
 import '../../responsive.dart';
 
+// ignore_for_file: avoid_print
 class RankerDetailPage extends StatefulWidget {
   const RankerDetailPage({Key? key}) : super(key: key);
 
@@ -98,7 +99,7 @@ class _RankerDetailPageState extends State<RankerDetailPage> {
                   BoxShadow(
                     color: Colors.redAccent.withOpacity(0.5),
                     blurRadius: 4,
-                    offset: Offset(4, 8),
+                    offset: const Offset(4, 8),
                   ),
                 ],
               ),
@@ -113,7 +114,7 @@ class _RankerDetailPageState extends State<RankerDetailPage> {
                         padding: const EdgeInsets.only(left: 8.0, top: 8),
                         child: Text(
                           commentDataModel.userId,
-                          style: TextStyle(color: Colors.lightGreenAccent),
+                          style: const TextStyle(color: Colors.lightGreenAccent),
                         ),
                       ),
                     ],
@@ -232,14 +233,14 @@ class _RankerDetailPageState extends State<RankerDetailPage> {
                                                 ),
                                               ),
                                             ),
-                                            SizedBox(
+                                            const SizedBox(
                                               width: 10,
                                             ),
                                             Expanded(
                                               child: Text(
                                                 contentData.userId,
                                                 textScaleFactor: 2,
-                                                style: TextStyle(color: Colors.black),
+                                                style: const TextStyle(color: Colors.black),
                                               ),
                                             ),
                                           ],
@@ -256,7 +257,7 @@ class _RankerDetailPageState extends State<RankerDetailPage> {
                               ),
                               flex: 10,
                             ),
-                            Divider(
+                            const Divider(
                               height: 1,
                             ),
                             Expanded(
@@ -268,14 +269,14 @@ class _RankerDetailPageState extends State<RankerDetailPage> {
                             ),
                             /////////////////////////// 33333333333333/ /////////////////////////
                             //const Expanded(flex: 1, child: Divider()),
-                            Divider(
+                            const Divider(
                               height: 1,
                             ),
                             Expanded(
                               child: Container(
                                 color: Colors.white,
                                 child: Row(children: [
-                                  SizedBox(width: 10),
+                                  const SizedBox(width: 10),
                                   Flexible(
                                     child: Row(
                                       children: [
@@ -297,7 +298,7 @@ class _RankerDetailPageState extends State<RankerDetailPage> {
                                   Flexible(
                                     child: Row(
                                       children: [
-                                        Flexible(child: Icon(DIcons.remove_red_eye)),
+                                        const Flexible(child: Icon(DIcons.remove_red_eye)),
                                         Flexible(child: Text('( ${contentData.viewCount} )')),
                                       ],
                                     ),
@@ -308,7 +309,7 @@ class _RankerDetailPageState extends State<RankerDetailPage> {
                               ),
                               flex: 10,
                             ),
-                            Divider(
+                            const Divider(
                               height: 1,
                             ),
                           ],
@@ -329,7 +330,7 @@ class _RankerDetailPageState extends State<RankerDetailPage> {
                 child: GestureDetector(
                     onTap: () {
                       print('?????????');
-                      pagedown();
+                      pageDown();
                     },
                     child: AnimatedOpacity(
                         opacity: selected ? 1.0 : 0.0,
@@ -343,7 +344,7 @@ class _RankerDetailPageState extends State<RankerDetailPage> {
     return Container();
   }
 
-  void pagedown() async {
+  void pageDown() async {
     setState(() {
       selected = !selected;
     });

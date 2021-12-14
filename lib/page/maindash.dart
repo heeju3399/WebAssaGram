@@ -1,4 +1,3 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
@@ -13,7 +12,6 @@ import 'package:web/page/difprofilepage.dart';
 import 'package:web/page/ranker/rankerpage.dart';
 import 'package:web/page/user/profilepage.dart';
 import 'package:web/responsive.dart';
-
 import 'addpage.dart';
 import 'homepage.dart';
 import 'user/signmain.dart';
@@ -58,7 +56,6 @@ class _MainDashState extends State<MainDash> with SingleTickerProviderStateMixin
     DateTime now = DateTime.now();
     if (now.difference(currentBackPressTime) > const Duration(seconds: 2)) {
       currentBackPressTime = now;
-      //Fluttertoast.showToast(msg: '종료 하시려면 한번더 터치해주세요');aaasdfasdf yhnujiklo89v
       return Future.value(false);
     }
     return Future.value(true);
@@ -71,21 +68,9 @@ class _MainDashState extends State<MainDash> with SingleTickerProviderStateMixin
       checkLogin = true;
     }
     print('?? : $checkLogin');
-    return Scaffold(
-      backgroundColor: Colors.green,
-      appBar: AppBar(
-        title: const Text('Mobile!'),
-      ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: (){
-      //     pageController.nextPage(duration: Duration(seconds: 1), curve: Curves.ease);
-      //   },
-      //   child: Icon(Icons.add),
-      // ),
-    );
+    return Scaffold(backgroundColor: Colors.green, appBar: AppBar(title: const Text('Mobile!')));
   }
 
-//////////////////////////////////////////////////////////////////////////////////////
   Widget mainContent(BuildContext context, String userId, HomePageProvider homePageProvider) {
     Widget result = const CircularProgressIndicator();
     if (homePageProvider.pageFlag == 0) {
@@ -94,7 +79,6 @@ class _MainDashState extends State<MainDash> with SingleTickerProviderStateMixin
       listViewCount = 5;
       result = const AddPage();
     } else if (homePageProvider.pageFlag == 2) {
-      //result = favoritePage(context, userId);
       result = const RankerPage();
     } else if (homePageProvider.pageFlag == 3) {
       result = const ProfilePage();
@@ -113,10 +97,12 @@ class _MainDashState extends State<MainDash> with SingleTickerProviderStateMixin
         backgroundColor: Colors.white,
         primary: true,
         title: Padding(
-          padding: EdgeInsets.only(left: 50),
-          child: InkWell(onTap: (){
-            homePageProvider.pageChange(0);
-          },child: Text('ASSA_GRAM', style: TextStyle(fontSize: 20, color: Colors.black))),
+          padding: const EdgeInsets.only(left: 50),
+          child: InkWell(
+              onTap: () {
+                homePageProvider.pageChange(0);
+              },
+              child: const Text('ASSA_GRAM', style: TextStyle(fontSize: 20, color: Colors.black))),
         ),
         actions: [
           const SizedBox(width: 50),
@@ -133,11 +119,11 @@ class _MainDashState extends State<MainDash> with SingleTickerProviderStateMixin
                     ? const Icon(DIcons.add_circle, color: Colors.red)
                     : const Icon(DIcons.add_circle, color: Colors.black)),
           if (userId != MyWord.LOGIN) const SizedBox(width: 20),
-            IconButton(
-                onPressed: () => homePageProvider.pageChange(2),
-                icon: homePageProvider.isMainIconsColor[2]
-                    ? const Icon(Icons.favorite, color: Colors.red)
-                    : const Icon(Icons.favorite_border, color: Colors.black)),
+          IconButton(
+              onPressed: () => homePageProvider.pageChange(2),
+              icon: homePageProvider.isMainIconsColor[2]
+                  ? const Icon(Icons.favorite, color: Colors.red)
+                  : const Icon(Icons.favorite_border, color: Colors.black)),
           const SizedBox(width: 20),
           //로그인했으면 프로필 버튼!
           if (userId != MyWord.LOGIN)
@@ -154,13 +140,11 @@ class _MainDashState extends State<MainDash> with SingleTickerProviderStateMixin
                     ? const Icon(DIcons.sign_in, color: Colors.red)
                     : const Icon(DIcons.sign_in, color: Colors.black)),
           const SizedBox(width: 100),
-          //tab bar!!
         ],
       ),
       body: SingleChildScrollView(
           controller: _scrollController1,
           physics: homePageProvider.save ? const NeverScrollableScrollPhysics() : const AlwaysScrollableScrollPhysics(),
-          //physics: const ScrollPhysics(),
           child: Center(
               child: Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, crossAxisAlignment: CrossAxisAlignment.center, children: [
             const SizedBox(height: 30),
@@ -192,33 +176,4 @@ class _MainDashState extends State<MainDash> with SingleTickerProviderStateMixin
           : null,
     );
   }
-
-  //
-  // void _logInOperation(BuildContext context) async {
-  //   if (overClick) {
-  //     setState(() {
-  //       logInCircle = !logInCircle;
-  //     });
-  //     overClick = false;
-  //     await UserControl.logIn(textFiledIdController.text, textFiledPassController.text).then((map) {
-  //       print('map : $map');
-  //       if (map.isNotEmpty) {
-  //         if (map.values.first == 'pass') {
-  //           //String userid = textFiledIdController.text.toString();
-  //           //MyShared myShared = MyShared();
-  //           //myShared.setUserId(userid);
-  //
-  //           //Navigator.of(context).pop();
-  //         } else {
-  //           MyDialog.setContentDialog(title: map.values.first.toString(), message: map.values.last.toString(), context: context);
-  //           textFiledPassController.clear();
-  //         }
-  //         setState(() {
-  //           logInCircle = !logInCircle;
-  //         });
-  //       }
-  //       overClick = true;
-  //     });
-  //   }
-  // }
 }

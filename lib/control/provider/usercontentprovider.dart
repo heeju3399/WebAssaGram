@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:web/model/content.dart';
 import 'package:web/server/nodeserver.dart';
-
 import 'contentprovider.dart';
 
+// ignore_for_file: avoid_print
 class UserContentProvider extends ChangeNotifier {
   List<dynamic> userContentDataList = [];
   List profileImage = [];
@@ -13,9 +13,7 @@ class UserContentProvider extends ChangeNotifier {
   bool downEnd = true;
   bool upEnd = true;
   bool init = true;
-
   String userProfileImageUri = '';
-
   int getContentCountPlus = 100;
   int contentPageIndex = 0;
   int contentCount = 0;
@@ -40,7 +38,6 @@ class UserContentProvider extends ChangeNotifier {
           userProfileImageUri = '';
         }
       }
-      print('profile?? !!!!!!!!!!!!!!!!!! $userProfileImageUri ');
       if (userProfileImageUri == '') {
         userProfileImageUri = 'http://172.30.1.19:3000/view/basic.png';
       }
@@ -66,9 +63,7 @@ class UserContentProvider extends ChangeNotifier {
     List resultList = await NodeServer.setProfileImage(userId, googleAccessId, image);
     if (resultList.elementAt(0) == 'true') {
       String profileImgUrl = resultList.elementAt(1).toString();
-      print('profileImgUrl???????????? $profileImgUrl');
       userProfileImageUri = 'http://172.30.1.19:3000$profileImgUrl';
-      print('profileImgUrl???????????? $userProfileImageUri');
       notifyListeners();
     } else {}
   }
@@ -76,7 +71,6 @@ class UserContentProvider extends ChangeNotifier {
   Future<bool> deleteAllContent(String userId) async {
     bool returnBool = false;
     await NodeServer.deleteAllContent(userId).then((value) {
-      print('value???????? $value');
       if (value) {
         userContentDataList.clear();
         contentCount = 0;
@@ -93,7 +87,6 @@ class UserContentProvider extends ChangeNotifier {
 
   void deleteContent(int index, String userId, int contentId) async {
     await NodeServer.deleteContent(contentId, userId).then((value) {
-      print('value???????? $value');
       if (value) {
         userContentDataList.removeAt(index);
         int contentCount = 0;
@@ -121,7 +114,6 @@ class UserContentProvider extends ChangeNotifier {
   void setLike(int index, int likeAndBadCount) async {
     likeAndBadCount = likeAndBadCount + 1;
     ContentDataModel contentDataModel = userContentDataList.elementAt(index);
-    print('int alike count ${likeAndBadCount}');
     ContentDataModel contentDataModel2 = ContentDataModel(
         contentId: contentDataModel.contentId,
         userId: contentDataModel.userId,
@@ -202,12 +194,10 @@ class UserContentProvider extends ChangeNotifier {
 
   void initGetContent(String userId) async {
     print('user content init pass $userId');
-
     String notApproved = 'not pass';
     String stateErr = 'state err';
     String serverConnectFail = 'server connect fail';
     var result = await NodeServer.getUserContent(getContentCountPlus, userId);
-    print('result?????????? ${result}');
     if (result.contains(notApproved)) {
       print(notApproved);
     } else if (result.contains(stateErr)) {
@@ -237,26 +227,6 @@ class UserContentProvider extends ChangeNotifier {
     }
     notifyListeners();
   }
-
-  // void getUserContent(String userId) async {
-  //   print('====================provider getcontent pass======================');
-  //   String notApproved = 'not pass';
-  //   String stateErr = 'state err';
-  //   String serverConnectFail = 'server connect fail';
-  //   var result = await NodeServer.getUserContent(getContentCountPlus, userId);
-  //   if (result.contains(notApproved)) {
-  //     print(notApproved);
-  //   } else if (result.contains(stateErr)) {
-  //     print(stateErr);
-  //   } else if (result.contains(serverConnectFail)) {
-  //     print(serverConnectFail);
-  //   } else {
-  //     print('pass');
-  //     userContentDataList = result;
-  //   }
-  //   notifyListeners();
-  //   getContentCountPlus = getContentCountPlus + 6;
-  // }
 
   void refresh() async {
     notifyListeners();

@@ -2,6 +2,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:web/control/provider/userprovider.dart';
 import 'package:web/server/nodeserver.dart';
 
+// ignore_for_file: avoid_print
 class ContentControl {
   static Future<String> setLikeAndBad({required int flag, required int contentId, required int likeAndBad}) async {
     String result = '';
@@ -18,7 +19,6 @@ class ContentControl {
     String resultTime = '';
     int databaseTimeStampInt = int.parse(date);
     var toDay = DateTime.now();
-    //ring result = toDay.difference(DateTime.fromMillisecondsSinceEpoch(databaseTimeStampInt)).toString();
     int difDay = toDay.difference(DateTime.fromMillisecondsSinceEpoch(databaseTimeStampInt)).inDays;
     int difHour = toDay.difference(DateTime.fromMillisecondsSinceEpoch(databaseTimeStampInt)).inHours;
     int difMin = toDay.difference(DateTime.fromMillisecondsSinceEpoch(databaseTimeStampInt)).inMinutes;
@@ -50,10 +50,7 @@ class ContentControl {
       double year = difDay / 365;
       int yearInt = year.floor();
       resultTime = yearInt.toString() + agoYear;
-    } else {
-      print('???????????????????');
-    }
-    //print('결과 : $resultTime');
+    } else {}
     return resultTime;
   }
 
@@ -75,82 +72,4 @@ class ContentControl {
     }
     return resultMap;
   }
-
-  //
-  // static Future<List<MainContentDataModel>> getUserContents({required String userId}) async {
-  //   List response = [];
-  //   List<MainContentDataModel> returnList = [];
-  //   await NodeServer.getUserContents(userId: userId).then((value) => {response = value});
-  //   try {
-  //     if (response.first == 'pass') {
-  //       response = response.last;
-  //       response.forEach((element) {
-  //         MainContentDataModel mainContentDataModel = MainContentDataModel.fromJson(jsonDecode(jsonEncode(element)));
-  //         returnList.add(mainContentDataModel);
-  //       });
-  //     }
-  //   } catch (e) {
-  //     print('getUserContent-err($e)');
-  //   }
-  //   return returnList;
-  // }
-  //
-  // static Future<List<MainContentDataModel>> getContent2() async {
-  //   List response = [];
-  //   List<MainContentDataModel> returnList = [];
-  //   await NodeServer.getAllContents().then((value) => {response = value});
-  //   try {
-  //     if (response.first == 'pass') {
-  //       response = response.last;
-  //       response.forEach((element) {
-  //         MainContentDataModel mainContentDataModel = MainContentDataModel.fromJson(jsonDecode(jsonEncode(element)));
-  //         returnList.add(mainContentDataModel);
-  //       });
-  //     }
-  //   } catch (e) {
-  //     print('getContent2 err ($e)');
-  //   }
-  //   //returnList = returnList.reversed.toList();
-  //   return returnList;
-  // }
-
-  //
-//   static Future<bool> setComment({required String value, required int index, required String userId}) async {
-//
-//     bool result = false;
-//     await NodeServer.setComment(userId: userId, index: index, value: value).then((value) => {result = value});
-//     print('????????????? $result');
-//     return result;
-//   }
-
-// //
-
-// static void setLikeAndBad({required int flag, required int contentId}) {
-//   NodeServer.setLikeAndBad(contentId: contentId, likeAndBad: flag).then((value) => {});
-// }
-//
-// static void deleteContent(int contentId, String userId) {
-//   NodeServer.deleteContent(contentId, userId);
-// }
-//
-// static void deleteAllContent(int contentId, String userId) {
-//   NodeServer.deleteAllContent(contentId, userId);
-// }
-//
-// static void deleteComment({required int contentId, required String userId, required int order}) async {
-//   NodeServer.deleteComment(order: order, userId: userId, contentId: contentId); //bool 타입으로 리턴되는데 뭐쓰지?
-// }
-//
-// static void userDelete({required String userId}) async {
-//   bool check = false;
-//   await NodeServer.userDelete(userId: userId).then((value) => {
-//     check = value
-//   });
-//   if(check){
-//     MyShared.setUserId('LogIn');
-//     html.window.location.reload();
-//   }else{
-//
-//   }
-// }
 }

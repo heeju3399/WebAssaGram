@@ -2,10 +2,8 @@ import 'package:flutter/widgets.dart';
 
 class DIcons {
   DIcons._();
-
   static const _kFontFam = 'MyFlutterApp';
   static const String? _kFontPkg = null;
-
   static const IconData thumb_down = IconData(0xe800, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData remove_red_eye = IconData(0xe801, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData eye_off = IconData(0xe802, fontFamily: _kFontFam, fontPackage: _kFontPkg);

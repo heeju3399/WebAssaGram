@@ -56,7 +56,6 @@ class ImagesDataModel {
         mimetype: json['mimetype'],
         originalName: json['originalname'],
         path: json['path']
-
     );
   }
 }

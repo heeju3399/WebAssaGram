@@ -4,6 +4,7 @@ import 'package:web/control/provider/homepageprovider.dart';
 import 'package:web/control/provider/userprovider.dart';
 import 'package:web/control/user.dart';
 
+// ignore_for_file: avoid_print
 class SignUpBuild extends StatefulWidget {
   const SignUpBuild({Key? key}) : super(key: key);
 
@@ -17,7 +18,6 @@ class _SignUpBuildState extends State<SignUpBuild> {
   List<String> errTextSignUpList = [];
   bool logInCircle = true;
   bool isLoginHover = true;
-
   bool doubleCheck = false;
   int count = 0;
   bool idErrColor = false;
@@ -64,19 +64,16 @@ class _SignUpBuildState extends State<SignUpBuild> {
                   border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10.0)))),
               onSubmitted: (v) {
                 returnErrString(userProvider, homePageProvider);
-                //focusNodeSignUpList[1].requestFocus();
               },
               onChanged: (v) {
-                for(int i=0; i<3; i++){
+                for (int i = 0; i < 3; i++) {
                   errTextSignUpList[i] = '';
                 }
-                //print(v);
-                if(v.isNotEmpty){
-                  bool isko =isKorean(v);
-                  print('isko???????? $isko');
-                  if(isko){
+                if (v.isNotEmpty) {
+                  bool isko = isKorean(v);
+                  if (isko) {
                     errTextSignUpList[0] = '영문 숫자 특수문자 조합으로 부탁드려요';
-                  }else{
+                  } else {
                     if (v.length > 3) {
                       print('??');
                       UserControl.doubleCheck(v).then((value) {
@@ -100,7 +97,7 @@ class _SignUpBuildState extends State<SignUpBuild> {
                     }
                   }
                   setState(() {});
-                }else{
+                } else {
                   errTextSignUpList[0] = '';
                   idErrColor = false;
                   setState(() {});
@@ -110,16 +107,13 @@ class _SignUpBuildState extends State<SignUpBuild> {
           )),
       Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Container(
+          child: SizedBox(
               width: 300,
               child: TextField(
                   obscureText: true,
                   focusNode: focusNodeSignUpList[1],
                   controller: textEditingSignUpControllerList[1],
                   onSubmitted: (v) {
-                    //_logInOperation(context);
-                    //returnErrString();
-                    //focusNodeSignUpList[2].requestFocus();
                     returnErrString(userProvider, homePageProvider);
                   },
                   style: const TextStyle(fontSize: 20, color: Colors.white),
@@ -138,15 +132,13 @@ class _SignUpBuildState extends State<SignUpBuild> {
                   )))),
       Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Container(
+          child: SizedBox(
               width: 300,
               child: TextField(
                   obscureText: true,
                   focusNode: focusNodeSignUpList[2],
                   controller: textEditingSignUpControllerList[2],
                   onSubmitted: (v) {
-                    //_logInOperation(context);
-                    //returnErrString();
                     returnErrString(userProvider, homePageProvider);
                   },
                   style: const TextStyle(fontSize: 20, color: Colors.white),
@@ -189,22 +181,24 @@ class _SignUpBuildState extends State<SignUpBuild> {
     ]);
   }
 
-
   void returnErrString(UserProvider userProvider, HomePageProvider homePageProvider) {
     print('errstring messgae pass');
     String resultId = '';
     String resultPass = '';
     String resultPassCheck = '';
     bool isko = false;
-    if(textEditingSignUpControllerList[0].text.isNotEmpty){
+    if (textEditingSignUpControllerList[0].text.isNotEmpty) {
       isko = isKorean(textEditingSignUpControllerList[0].text);
     }
-
     if (textEditingSignUpControllerList[0].text.isEmpty) {
       resultId = '아디디를 적어주세요';
       focusNodeSignUpList[0].requestFocus();
     } else if (textEditingSignUpControllerList[0].text.length < 4) {
       resultId = '4자리 이상 적어주세요';
+      focusNodeSignUpList[0].requestFocus();
+    } else if (textEditingSignUpControllerList[0].text.length > 15) {
+      resultId = '15자리 이하로 적어주세요';
+      idErrColor = false;
       focusNodeSignUpList[0].requestFocus();
     } else if (isko) {
       print('??????????');
@@ -227,20 +221,16 @@ class _SignUpBuildState extends State<SignUpBuild> {
       focusNodeSignUpList[2].requestFocus();
       //중복체크
     } else if (doubleCheck) {
-      print('double check true');
-      //서버연동
-      UserControl.signUp(textEditingSignUpControllerList[0].text, textEditingSignUpControllerList[1].text).then((value){
-        print('server pass################ $value');
-        if(value){
+      UserControl.signUp(textEditingSignUpControllerList[0].text, textEditingSignUpControllerList[1].text).then((value) {
+        if (value) {
           userProvider.setUserId(textEditingSignUpControllerList[0].text);
           homePageProvider.pageChange(0);
-        }else{
+        } else {
           resultPassCheck = 'err';
         }
       });
       print('pass');
-    }else{
-      print('double check false');
+    } else {
       resultId = '사용중인 아이디 입니다.';
       textEditingSignUpControllerList[0].clear();
       idErrColor = false;
@@ -260,9 +250,8 @@ class _SignUpBuildState extends State<SignUpBuild> {
     isKorean = (inputToUniCode >= 12593 && inputToUniCode <= 12643)
         ? true
         : (inputToUniCode >= 44032 && inputToUniCode <= 55203)
-        ? true
-        : false;
+            ? true
+            : false;
     return isKorean;
   }
-  
 }

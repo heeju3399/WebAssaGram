@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:web/control/provider/homepageprovider.dart';
 import 'package:web/control/provider/userprovider.dart';
-import 'package:web/control/user.dart';
-import 'package:web/page/dialog/dialog.dart';
 
+// ignore_for_file: avoid_print
 class SignInBuild extends StatefulWidget {
   const SignInBuild({Key? key}) : super(key: key);
 
@@ -62,13 +61,12 @@ class _SignInBuildState extends State<SignInBuild> {
           )),
       Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Container(
+          child: SizedBox(
               width: 300,
               child: TextField(
                   focusNode: focusNodePassEdit,
                   controller: textFiledPassController,
                   onSubmitted: (v) {
-                    //_logInOperation(context);
                     returnErrString(userProvider, homePageProvider);
                   },
                   style: const TextStyle(fontSize: 20, color: Colors.white),
@@ -98,10 +96,7 @@ class _SignInBuildState extends State<SignInBuild> {
                 setState(() {});
               },
               onTap: () {
-                // _logInOperation(context);
                 returnErrString(userProvider, homePageProvider);
-                //loginProvider.setUserId('admin');
-                //Navigator.pop(context);
               },
               child: Container(
                   width: 250,
@@ -115,26 +110,10 @@ class _SignInBuildState extends State<SignInBuild> {
     ]);
   }
 
-  // void callGoogleApiAccess(UserProvider userProvider, HomePageProvider homepageProvider) async {
-  //   int result = await userProvider.googleLogin();
-  //   if (result == 0) {
-  //     //로그인이 안된것
-  //     print('뭐지? $result');
-  //   } else if (result == 1) {
-  //     //pass
-  //     homepageProvider.pageChange(0);
-  //   } else if (result == 2) {
-  //     print('뭐지? $result');
-  //     //서버에서 팅긴것
-  //     MyDialog.setContentDialog(title: '응답이 없습니다.', message: '관리자에게 문의 바랍니다.', context: context);
-  //   }
-  // }
-
   void returnErrString(UserProvider userProvider, HomePageProvider homePageProvider) async {
     String resultId = '';
     String resultPass = '';
 
-    //id//
     if (textFiledIdController.text.isEmpty) {
       resultId = '아디디를 적어주세요';
       focusNodeIdEdit.requestFocus();

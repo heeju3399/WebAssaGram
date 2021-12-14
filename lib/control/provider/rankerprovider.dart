@@ -1,9 +1,9 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:web/model/content.dart';
 import 'package:web/model/ranker.dart';
 import 'package:web/server/nodeserver.dart';
 
+// ignore_for_file: avoid_print
 class RankerProvider extends ChangeNotifier {
   RankerProvider() {
     initGetRankerContent();
@@ -20,7 +20,6 @@ class RankerProvider extends ChangeNotifier {
   void setDetailIndex(int index) {
     detailIndex = index;
   }
-
 
   void setProfileImageList(List profileImageList) {
     this.profileImageList = profileImageList;
@@ -39,8 +38,6 @@ class RankerProvider extends ChangeNotifier {
       print(serverConnectFail);
     } else {
       print('pass');
-      //재단하자!
-      //   List rContentList = result.first;
       for (var element in result.first) {
         ContentDataModel contentDataModel = ContentDataModel.fromJson(element);
         rankerDetailContentList.add(contentDataModel);
@@ -56,7 +53,6 @@ class RankerProvider extends ChangeNotifier {
             userProfileImageUri = '';
           }
         }
-        print('profile?? !!!!!!!!!!!!!!!!!! $userProfileImageUri ');
         if (userProfileImageUri == '') {
           userProfileImageUri = 'http://172.30.1.19:3000/view/basic.png';
         }
@@ -94,8 +90,6 @@ class RankerProvider extends ChangeNotifier {
       print(serverConnectFail);
     } else {
       print('pass');
-      //재단하자!
-      //   List rContentList = result.first;
       for (var element in result.first) {
         ContentDataModel contentDataModel = ContentDataModel.fromJson(element);
         rankerDetailContentList.add(contentDataModel);
@@ -111,7 +105,6 @@ class RankerProvider extends ChangeNotifier {
             userProfileImageUri = '';
           }
         }
-        print('profile?? !!!!!!!!!!!!!!!!!! $userProfileImageUri ');
         if (userProfileImageUri == '') {
           userProfileImageUri = 'http://172.30.1.19:3000/view/basic.png';
         }
@@ -120,7 +113,6 @@ class RankerProvider extends ChangeNotifier {
         ImagesDataModel imagesDataModel = ImagesDataModel.fromJson(contentDataModel.images[0]);
         String fileName = imagesDataModel.filename;
         String urlString = 'http://172.30.1.19:3000/view/$fileName';
-
         RankerContentDataModel rankerContentDataModel = RankerContentDataModel(
             contentId: contentDataModel.contentId,
             userId: contentDataModel.userId,
