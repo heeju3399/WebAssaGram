@@ -7,6 +7,7 @@ import 'package:web/control/content.dart';
 import 'package:web/control/provider/rankerprovider.dart';
 import 'package:web/model/content.dart';
 import 'package:web/model/icons.dart';
+import 'package:web/model/myword.dart';
 import '../../responsive.dart';
 
 // ignore_for_file: avoid_print
@@ -52,7 +53,7 @@ class _RankerDetailPageState extends State<RankerDetailPage> {
     for (var element in imagecontent) {
       ImagesDataModel imagesDataModel = ImagesDataModel.fromJson(element);
       String fileName = imagesDataModel.filename;
-      String urlString = 'http://172.30.1.19:3000/view/$fileName';
+      String urlString =  MyWord.imagesServerIpAndPort+fileName;
       urlList.add(urlString);
     }
 

@@ -17,10 +17,15 @@ class UserProvider extends ChangeNotifier {
   String contentId = '';
   String myProfileImageString = '';
   String difProfileImageString = '';
+  String difChooseContentUserId = ''; // 다른계정으로 프로필 클릭시 어떤 콘텐트를 클릭했는지!
   List profileImageList = [];
 
   late XFile? profileImage;
   bool isProfileImage = false;
+
+  void setDifChooseContentUserId(String contentUserId){
+    difChooseContentUserId = contentUserId;
+  }
 
   void setProfileImagesList(List images) {
     profileImageList = images;
@@ -36,7 +41,7 @@ class UserProvider extends ChangeNotifier {
       Map ss = profileImageList.firstWhere((e) => e['userId'] == userId);
       Map sss = ss['images'];
       String profileImageName = sss['filename'].toString();
-      myProfileImageString = 'http://172.30.1.19:3000/view/' + profileImageName;
+      myProfileImageString = MyWord.imagesServerIpAndPort+'/view/' + profileImageName;
       returnString = myProfileImageString;
     } catch (e) {
       print('err $e');

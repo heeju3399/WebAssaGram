@@ -1,9 +1,110 @@
+import 'package:flutter/cupertino.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:web/control/provider/contentprovider.dart';
+import 'package:web/control/provider/usercontentprovider.dart';
 import 'package:web/control/provider/userprovider.dart';
+import 'package:web/model/content.dart';
+import 'package:web/model/myword.dart';
 import 'package:web/server/nodeserver.dart';
 
 // ignore_for_file: avoid_print
 class ContentControl {
+
+  static void navigatorPush(BuildContext context, Widget page) {
+    Navigator.push(
+      context,
+      PageRouteBuilder(
+        opaque: false,
+        pageBuilder: (context, animation, secondaryAnimation) => page,
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          const begin = Offset(1.0, 0.0);
+          final end = Offset.zero;
+          final curve = Curves.ease;
+          final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+          return SlideTransition(
+            position: animation.drive(tween),
+            child: child,
+          );
+        },
+      ),
+    );
+  }
+
+  static String redefine(ContentProvider contentProvider, ContentDataModel contentData) {
+    String returnProfileString = MyWord.imagesServerIpAndPort + 'basic.png';
+    String imgString = '';
+    List profileImageList = contentProvider.profileImageList;
+    for (var element in profileImageList) {
+      String userid5 = element['userId'];
+      if (contentData.userId == userid5) {
+        Map map = element['images'];
+        imgString = map.values.elementAt(5).toString();
+        returnProfileString = MyWord.imagesServerIpAndPort + imgString;
+        break;
+      } else {
+        returnProfileString = MyWord.imagesServerIpAndPort + 'basic.png';
+      }
+    }
+    return returnProfileString;
+  }
+
+  static String redefineUserProfileImage(ContentProvider contentProvider, String userId) {
+    String returnProfileString = MyWord.imagesServerIpAndPort + 'basic.png';
+    String imgString = '';
+    List profileImageList = contentProvider.profileImageList;
+    for (var element in profileImageList) {
+      String userid5 = element['userId'];
+      if (userId == userid5) {
+        Map map = element['images'];
+        imgString = map.values.elementAt(5).toString();
+        returnProfileString = MyWord.imagesServerIpAndPort + imgString;
+        break;
+      } else {
+        returnProfileString = MyWord.imagesServerIpAndPort + 'basic.png';
+      }
+    }
+    return returnProfileString;
+  }
+
+  static String redefineComment(ContentProvider contentProvider, CommentDataModel commentDataModel) {
+    String returnProfileString = MyWord.imagesServerIpAndPort + 'basic.png';
+    String imgString = '';
+    List profileImageList = contentProvider.profileImageList;
+    for (var element in profileImageList) {
+      String userid5 = element['userId'];
+      if (commentDataModel.userId == userid5) {
+        Map map = element['images'];
+        imgString = map.values.elementAt(5).toString();
+        returnProfileString = MyWord.imagesServerIpAndPort + imgString;
+        break;
+      } else {
+        returnProfileString = MyWord.imagesServerIpAndPort + 'basic.png';
+      }
+    }
+    return returnProfileString;
+  }
+
+  static String redefineUserComment(UserContentProvider userContentProvider, CommentDataModel commentDataModel) {
+    String returnProfileString = MyWord.imagesServerIpAndPort + 'basic.png';
+    String imgString = '';
+    List profileImageList = userContentProvider.profileImage;
+    for (var element in profileImageList) {
+      String userid5 = element['userId'];
+      if (commentDataModel.userId == userid5) {
+        Map map = element['images'];
+        imgString = map.values.elementAt(5).toString();
+        returnProfileString = MyWord.imagesServerIpAndPort + imgString;
+        break;
+      } else {
+        returnProfileString = MyWord.imagesServerIpAndPort + 'basic.png';
+      }
+    }
+    print('-*---------------------');
+    print(returnProfileString);
+    return returnProfileString;
+  }
+
+
   static Future<String> setLikeAndBad({required int flag, required int contentId, required int likeAndBad}) async {
     String result = '';
     bool ss = await NodeServer.setLikeAndBad(contentId: contentId, likeAndBadFlag: flag, likeAndBadCount: likeAndBad);

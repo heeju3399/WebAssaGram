@@ -136,6 +136,13 @@ class _SignInBuildState extends State<SignInBuild> {
           count2 = 0;
           userProvider.setUserId(textFiledIdController.text);
           homePageProvider.pageChange(0);
+          // print('*****************************');
+          // print(Navigator.of(context).canPop());
+
+          if(Navigator.of(context).canPop()){
+            Navigator.of(context).pop();
+          }
+
         } else if (result == 2) {
           //아이디 비밀번호가 맞지 않음
           resultPass = '아이디와 비밀번호를 체크해주세요 \n틀린횟수 ( $count2 ) ';

@@ -24,7 +24,7 @@ class _RankerPageState extends State<RankerPage> {
   Widget build(BuildContext context) {
     ContentProvider contentProvider = Provider.of<ContentProvider>(context);
     RankerProvider rankerProvider = Provider.of<RankerProvider>(context);
-    rankerProvider.setProfileImageList(contentProvider.profileImage);
+    rankerProvider.setProfileImageList(contentProvider.profileImageList);
     List rankerContentList = rankerProvider.rankerContentList;
     return Center(
         child: Column(

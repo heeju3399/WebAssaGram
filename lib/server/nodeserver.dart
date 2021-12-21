@@ -271,7 +271,6 @@ class NodeServer {
     String siteKey = 'secretKey';
     Map<String, String> map = {};
     map = {"sitekey": siteKey, "flag": flag, "getcontentcountplus": '$getContentCountPlus', "userid": userId};
-
     try {
       var response = await http.post(Uri.parse(url), headers: map);
       int state = response.statusCode;
@@ -289,7 +288,6 @@ class NodeServer {
             ContentDataModel contentDataModel = ContentDataModel.fromJson(element1);
             returnList.add(contentDataModel);
           }
-
         } else {
           returnList.add('not pass');
         }
@@ -529,7 +527,6 @@ class NodeServer {
           if (responsePassCheck.values.elementAt(1) == true) {
             //아이디와 비번이 맞음 통과
             returnInt.add(1);
-            returnInt.add(responsePassCheck.values.elementAt(2));
           } else {
             //아이디 중복 안됨
             returnInt.add(2); //서버와 통신은 잘됨 아이디와 비밀번호가 다름!!

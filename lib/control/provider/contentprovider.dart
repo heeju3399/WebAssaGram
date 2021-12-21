@@ -5,15 +5,19 @@ import 'package:web/server/nodeserver.dart';
 
 // ignore_for_file: avoid_print
 class ContentProvider extends ChangeNotifier {
-  ContentProvider() {
-    initGetContent();
-  }
+
   List<dynamic> contentDataModelList = [];
   int getContentCountPlus = 5;
   List<int> userIndexContentId = [];
-  List profileImage = [];
+  List profileImageList = [];
   List bestProfileList = [];
   bool firstPass = true;
+  int contentIndex = 0;
+  bool init = true;
+
+  void setChooseContent(int index){
+    contentIndex = index;
+  }
 
   Future<bool> setComment({required int contentIndex, required String comment, required String userId, required int pageListIndex}) async {
     bool returnBool = false;
@@ -113,6 +117,7 @@ class ContentProvider extends ChangeNotifier {
   }
 
   void initGetContent() async {
+
     String notApproved = 'not pass';
     String stateErr = 'state err';
     String serverConnectFail = 'server connect fail';
@@ -127,9 +132,9 @@ class ContentProvider extends ChangeNotifier {
       print('pass');
       int resultLen = result.length;
       if(result.last == []){
-        profileImage = [];
+        profileImageList = [];
       }else{
-        profileImage = result.last;
+        profileImageList = result.last;
       }
       List contentData = result.getRange(0, resultLen -1 ).toList();
       contentDataModelList = contentData;
@@ -154,9 +159,9 @@ class ContentProvider extends ChangeNotifier {
       print('pass');
       int resultLen = result.length;
       if(result.last == []){
-        profileImage = [];
+        profileImageList = [];
       }else{
-        profileImage = result.last;
+        profileImageList = result.last;
       }
       List contentData = result.getRange(0, resultLen -1 ).toList();
       contentDataModelList = contentData;

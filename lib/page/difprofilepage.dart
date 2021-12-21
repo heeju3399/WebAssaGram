@@ -7,7 +7,10 @@ import 'package:web/control/provider/homepageprovider.dart';
 import 'package:web/control/provider/usercontentprovider.dart';
 import 'package:web/control/provider/userprovider.dart';
 import 'package:web/model/content.dart';
+import 'package:web/model/myword.dart';
 import 'package:web/page/user/profiledetailpage.dart';
+
+import '../responsive.dart';
 
 // ignore_for_file: avoid_print
 class DifProfilePage extends StatefulWidget {
@@ -37,87 +40,14 @@ class _DifProfilePageState extends State<DifProfilePage> {
 
     return Container(
         child:
-            //Responsive.isLarge(context) ?
-            windows(userProvider, homePageProvider, userContentProvider, contentProvider)
-        //: mobile(userProvider, homePageProvider)
-        );
+        //Responsive.isLarge(context)            ?
+        windows(userProvider, homePageProvider, userContentProvider, contentProvider)
+           // : mobile(userProvider, homePageProvider)
+    );
   }
 
-  // Center mobile(UserProvider userProvider, HomePageProvider homePageProvider) {
-  //   return Center(
-  //     child: Column(
-  //       mainAxisAlignment: MainAxisAlignment.center,
-  //       crossAxisAlignment: CrossAxisAlignment.center,
-  //       children: [
-  //         Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-  //           Padding(
-  //               padding: const EdgeInsets.only(top: 10),
-  //               child: Text('${userProvider.userId} 님의 글',
-  //                   maxLines: 1, overflow: TextOverflow.clip, style: TextStyle(fontSize: 15, color: Colors.white))),
-  //           const Padding(
-  //               padding: EdgeInsets.only(top: 10),
-  //               child: Text('길게 누르면 지워집니다', maxLines: 1, overflow: TextOverflow.clip, style: TextStyle(fontSize: 15, color: Colors.white))),
-  //           Padding(
-  //               padding: const EdgeInsets.only(top: 10),
-  //               child: Container(
-  //                   decoration: BoxDecoration(color: Colors.white12, borderRadius: BorderRadius.all(Radius.circular(10.0))),
-  //                   child: TextButton(
-  //                       onPressed: () {
-  //                         userProvider.logOut();
-  //                         homePageProvider.pageChange(0);
-  //                       },
-  //                       child: Container(
-  //                           width: 130,
-  //                           height: 40,
-  //                           alignment: Alignment.center,
-  //                           child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-  //                             Icon(
-  //                               Icons.logout,
-  //                               color: Colors.white,
-  //                             ),
-  //                             SizedBox(
-  //                               width: 10,
-  //                             ),
-  //                             Text('로그아웃', style: TextStyle(color: Colors.white))
-  //                           ])))))
-  //         ]),
-  //         Padding(
-  //             padding: const EdgeInsets.only(top: 10),
-  //             child: Container(
-  //               width: 500,
-  //             )),
-  //         Row(
-  //           mainAxisAlignment: MainAxisAlignment.center,
-  //           crossAxisAlignment: CrossAxisAlignment.center,
-  //           children: [
-  //             Padding(
-  //               padding: const EdgeInsets.all(8.0),
-  //               child: Container(
-  //                   width: 200,
-  //                   height: 40,
-  //                   decoration: BoxDecoration(color: Colors.red, borderRadius: BorderRadius.all(Radius.circular(10))),
-  //                   child: TextButton(
-  //                       onPressed: () {
-  //                         //contentAllDelete(contentId2);
-  //                       },
-  //                       child: Text('전체삭제', textScaleFactor: 2, style: TextStyle(color: Colors.white)))),
-  //             ),
-  //             Padding(
-  //                 padding: const EdgeInsets.all(18.0),
-  //                 child: Container(
-  //                     width: 200,
-  //                     height: 40,
-  //                     decoration: BoxDecoration(color: Colors.redAccent, borderRadius: BorderRadius.all(Radius.circular(10))),
-  //                     child: TextButton(
-  //                         onPressed: () {
-  //                           //userDelete();
-  //                         },
-  //                         child: Text('회원탈퇴', textScaleFactor: 2, style: TextStyle(color: Colors.white)))))
-  //           ],
-  //         ),
-  //       ],
-  //     ),
-  //   );
+  // Widget mobile(UserProvider userProvider, HomePageProvider homePageProvider) {
+  //   return Container(width: 500,height: 500,color: Colors.redAccent,);
   // }
 
   Center windows(
@@ -204,7 +134,7 @@ class _DifProfilePageState extends State<DifProfilePage> {
                     for (var contentDataImages in contentData.images) {
                       ImagesDataModel imagesDataModel = ImagesDataModel.fromJson(contentDataImages);
                       String fileName = imagesDataModel.filename;
-                      String urlString = 'http://172.30.1.19:3000/view/$fileName';
+                      String urlString = MyWord.imagesServerIpAndPort + fileName;
                       imagesUrlList.add(urlString);
                     }
                     return Padding(

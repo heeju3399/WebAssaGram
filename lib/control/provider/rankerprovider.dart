@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:web/model/content.dart';
+import 'package:web/model/myword.dart';
 import 'package:web/model/ranker.dart';
 import 'package:web/server/nodeserver.dart';
 
@@ -47,20 +48,20 @@ class RankerProvider extends ChangeNotifier {
           if (contentDataModel.userId == userid5) {
             Map map = element['images'];
             String imgString = map.values.elementAt(5).toString();
-            userProfileImageUri = 'http://172.30.1.19:3000/view/$imgString';
+            userProfileImageUri = MyWord.imagesServerIpAndPort + imgString;
             break;
           } else {
             userProfileImageUri = '';
           }
         }
         if (userProfileImageUri == '') {
-          userProfileImageUri = 'http://172.30.1.19:3000/view/basic.png';
+          userProfileImageUri =  MyWord.imagesServerIpAndPort+'basic.png';
         }
         profileImageListStringUri.add(userProfileImageUri);
 
         ImagesDataModel imagesDataModel = ImagesDataModel.fromJson(contentDataModel.images[0]);
         String fileName = imagesDataModel.filename;
-        String urlString = 'http://172.30.1.19:3000/view/$fileName';
+        String urlString =  MyWord.imagesServerIpAndPort+fileName;
 
         RankerContentDataModel rankerContentDataModel = RankerContentDataModel(
             contentId: contentDataModel.contentId,
@@ -99,20 +100,20 @@ class RankerProvider extends ChangeNotifier {
           if (contentDataModel.userId == userid5) {
             Map map = element['images'];
             String imgString = map.values.elementAt(5).toString();
-            userProfileImageUri = 'http://172.30.1.19:3000/view/$imgString';
+            userProfileImageUri =  MyWord.imagesServerIpAndPort+imgString;
             break;
           } else {
             userProfileImageUri = '';
           }
         }
         if (userProfileImageUri == '') {
-          userProfileImageUri = 'http://172.30.1.19:3000/view/basic.png';
+          userProfileImageUri =  MyWord.imagesServerIpAndPort+'basic.png';
         }
         profileImageListStringUri.add(userProfileImageUri);
 
         ImagesDataModel imagesDataModel = ImagesDataModel.fromJson(contentDataModel.images[0]);
         String fileName = imagesDataModel.filename;
-        String urlString = 'http://172.30.1.19:3000/view/$fileName';
+        String urlString = MyWord.imagesServerIpAndPort+fileName;
         RankerContentDataModel rankerContentDataModel = RankerContentDataModel(
             contentId: contentDataModel.contentId,
             userId: contentDataModel.userId,

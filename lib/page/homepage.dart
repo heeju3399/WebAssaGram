@@ -29,6 +29,7 @@ class _HomePageState extends State<HomePage> {
   bool pageIsScrolling = false;
   int listViewLength = 0;
   bool myIdCheck = false;
+  bool init = true;
 
   @override
   Widget build(BuildContext context) {
@@ -38,18 +39,18 @@ class _HomePageState extends State<HomePage> {
   }
 
   String redefine(ContentProvider contentProvider, ContentDataModel contentData) {
-    String returnProfileString = 'http://172.30.1.19:3000/view/basic.png';
+    String returnProfileString = MyWord.imagesServerIpAndPort + 'basic.png';
     String imgString = '';
-    List profileImageList = contentProvider.profileImage;
+    List profileImageList = contentProvider.profileImageList;
     for (var element in profileImageList) {
       String userid5 = element['userId'];
       if (contentData.userId == userid5) {
         Map map = element['images'];
         imgString = map.values.elementAt(5).toString();
-        returnProfileString = 'http://172.30.1.19:3000/view/$imgString';
+        returnProfileString = MyWord.imagesServerIpAndPort + imgString;
         break;
       } else {
-        returnProfileString = 'http://172.30.1.19:3000/view/basic.png';
+        returnProfileString = MyWord.imagesServerIpAndPort + 'basic.png';
       }
     }
     return returnProfileString;
@@ -58,9 +59,16 @@ class _HomePageState extends State<HomePage> {
   Widget homePage(BuildContext context, String userId, UserProvider userProvider) {
     print('home page pass $userId');
     final contentProvider = Provider.of<ContentProvider>(context);
+
+    if (init) {
+      contentProvider.initGetContent();
+      init = false;
+      setState(() {});
+    }
+
     final homepageProvider = Provider.of<HomePageProvider>(context);
     final contentDataList = contentProvider.contentDataModelList;
-    userProvider.setProfileImagesList(contentProvider.profileImage);
+    userProvider.setProfileImagesList(contentProvider.profileImageList);
 
     return Column(
       children: [
@@ -84,7 +92,7 @@ class _HomePageState extends State<HomePage> {
                   for (var contentDataImages in contentData.images) {
                     ImagesDataModel imagesDataModel = ImagesDataModel.fromJson(contentDataImages);
                     String fileName = imagesDataModel.filename;
-                    String urlString = 'http://172.30.1.19:3000/view/$fileName';
+                    String urlString = MyWord.imagesServerIpAndPort + fileName;
                     imagesUrlList.add(urlString);
                   }
                   List<String> reversList = imagesUrlList.reversed.toList();
@@ -183,7 +191,7 @@ class _HomePageState extends State<HomePage> {
                                             icon: const Icon(DIcons.favorite),
                                             iconSize: 25,
                                             color: Colors.white),
-                                        RichText(text: TextSpan(text: '${contentData.likeCount}', style:const TextStyle(color: Colors.white))),
+                                        RichText(text: TextSpan(text: '${contentData.likeCount}', style: const TextStyle(color: Colors.white))),
                                         const SizedBox(width: 25),
                                         IconButton(
                                             onPressed: () {
@@ -196,7 +204,7 @@ class _HomePageState extends State<HomePage> {
                                             icon: const Icon(DIcons.emo_unhappy),
                                             iconSize: 25,
                                             color: Colors.white),
-                                        RichText(text: TextSpan(text: '${contentData.badCount}', style:const TextStyle(color: Colors.white))),
+                                        RichText(text: TextSpan(text: '${contentData.badCount}', style: const TextStyle(color: Colors.white))),
                                         const SizedBox(width: 25),
                                         IconButton(
                                             mouseCursor: SystemMouseCursors.basic,
@@ -204,12 +212,13 @@ class _HomePageState extends State<HomePage> {
                                             icon: const Icon(DIcons.remove_red_eye),
                                             iconSize: 25,
                                             color: Colors.white),
-                                        RichText(text: TextSpan(text: '${contentData.viewCount}', style:const TextStyle(color: Colors.white))),
+                                        RichText(text: TextSpan(text: '${contentData.viewCount}', style: const TextStyle(color: Colors.white))),
                                       ],
                                     ),
                                     Row(
                                       children: [
-                                        RichText(text: TextSpan(text: ContentControl.contentTimeStamp(date), style:const TextStyle(color: Colors.white))),
+                                        RichText(
+                                            text: TextSpan(text: ContentControl.contentTimeStamp(date), style: const TextStyle(color: Colors.white))),
                                         const SizedBox(width: 20),
                                       ],
                                     )
@@ -242,9 +251,12 @@ class _HomePageState extends State<HomePage> {
                                     return Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                                          Text(commentDataModel.userId, style: const TextStyle(color: Colors.white, fontSize: 20)),
+                                          Text(commentDataModel.userId,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.clip,
+                                              style: const TextStyle(color: Colors.white, fontSize: 20)),
                                           SizedBox(
-                                              width: 570,
+                                              width: 550,
                                               child: Text(commentString,
                                                   style: const TextStyle(color: Colors.white, fontSize: 20),
                                                   maxLines: 1,

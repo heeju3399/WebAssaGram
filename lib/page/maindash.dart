@@ -14,6 +14,7 @@ import 'package:web/page/user/profilepage.dart';
 import 'package:web/responsive.dart';
 import 'addpage.dart';
 import 'homepage.dart';
+import 'mobileDash/mobilemainpage.dart';
 import 'user/signmain.dart';
 
 class MainDash extends StatefulWidget {
@@ -49,7 +50,7 @@ class _MainDashState extends State<MainDash> with SingleTickerProviderStateMixin
     print('main Dash call userid : $userId');
     return WillPopScope(
         onWillPop: onWillPop,
-        child: Responsive.isLarge(context) ? windowPage(context, userId, homepageProvider, userProvider) : mobilePage(context, userId));
+        child: Responsive.isLarge(context) ? windowPage(context, userId, homepageProvider, userProvider) : const MobileMainDashPage());
   }
 
   Future<bool> onWillPop() {
@@ -59,16 +60,6 @@ class _MainDashState extends State<MainDash> with SingleTickerProviderStateMixin
       return Future.value(false);
     }
     return Future.value(true);
-  }
-
-  Widget mobilePage(BuildContext context, String userId) {
-    bool checkLogin = false;
-    print('???? : $userId');
-    if (userId == MyWord.LOGIN) {
-      checkLogin = true;
-    }
-    print('?? : $checkLogin');
-    return Scaffold(backgroundColor: Colors.green, appBar: AppBar(title: const Text('Mobile!')));
   }
 
   Widget mainContent(BuildContext context, String userId, HomePageProvider homePageProvider) {

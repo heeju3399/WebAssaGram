@@ -224,7 +224,8 @@ class _SignUpBuildState extends State<SignUpBuild> {
       UserControl.signUp(textEditingSignUpControllerList[0].text, textEditingSignUpControllerList[1].text).then((value) {
         if (value) {
           userProvider.setUserId(textEditingSignUpControllerList[0].text);
-          homePageProvider.pageChange(0);
+          //homePageProvider.pageChange(0);
+          Navigator.of(context).pop();
         } else {
           resultPassCheck = 'err';
         }

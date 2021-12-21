@@ -59,7 +59,7 @@ class _ProfileDetailPageState extends State<ProfileDetailPage> {
     for (var element in imageContent) {
       ImagesDataModel imagesDataModel = ImagesDataModel.fromJson(element);
       String fileName = imagesDataModel.filename;
-      String urlString = 'http://172.30.1.19:3000/view/$fileName';
+      String urlString = MyWord.serverIpAndPort+'/view/$fileName';
       urlList.add(urlString);
     }
     return PageView.builder(
@@ -419,21 +419,21 @@ class _ProfileDetailPageState extends State<ProfileDetailPage> {
 
   String profileImageSearch(ContentProvider contentProvider, String userId) {
     String returnString = '';
-    List ssd = contentProvider.profileImage;
+    List ssd = contentProvider.profileImageList;
 
     for (var element in ssd) {
       String userid5 = element['userId'];
       if (userId == userid5) {
         Map map = element['images'];
         String imgString = map.values.elementAt(5).toString();
-        returnString = 'http://172.30.1.19:3000/view/$imgString';
+        returnString = MyWord.serverIpAndPort+'/view/$imgString';
         break;
       } else {
         returnString = '';
       }
     }
     if (returnString == '') {
-      returnString = 'http://172.30.1.19:3000/view/basic.png';
+      returnString = MyWord.serverIpAndPort+'/view/basic.png';
     }
     return returnString;
   }

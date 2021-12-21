@@ -9,6 +9,7 @@ import 'package:web/control/provider/homepageprovider.dart';
 import 'package:web/control/provider/usercontentprovider.dart';
 import 'package:web/control/provider/userprovider.dart';
 import 'package:web/model/content.dart';
+import 'package:web/model/myword.dart';
 import 'package:web/page/dialog/dialog.dart';
 import 'package:web/page/user/profiledetailpage.dart';
 
@@ -242,7 +243,7 @@ class _ProFileState extends State<ProfilePage> {
                         for (var contentDataImages in contentData.images) {
                           ImagesDataModel imagesDataModel = ImagesDataModel.fromJson(contentDataImages);
                           String fileName = imagesDataModel.filename;
-                          String urlString = 'http://172.30.1.19:3000/view/$fileName';
+                          String urlString =  MyWord.imagesServerIpAndPort+fileName;
                           imagesUrlList.add(urlString);
                         }
                         return Padding(
