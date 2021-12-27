@@ -1,23 +1,3 @@
-// import 'package:flutter/material.dart';
-//
-// class MobileSignPage extends StatefulWidget {
-//   const MobileSignPage({Key? key}) : super(key: key);
-//
-//   @override
-//   _MobileSignPageState createState() => _MobileSignPageState();
-// }
-//
-// class _MobileSignPageState extends State<MobileSignPage> {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//
-//     );
-//   }
-// }
-
-import 'dart:html';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:web/control/provider/homepageprovider.dart';
@@ -26,7 +6,6 @@ import 'package:web/page/dialog/dialog.dart';
 import 'package:web/page/user/idsearchbuild.dart';
 import 'package:web/page/user/signinbuild.dart';
 import 'package:web/page/user/signupbuild.dart';
-
 
 // ignore_for_file: avoid_print
 class MobileSignPage extends StatefulWidget {

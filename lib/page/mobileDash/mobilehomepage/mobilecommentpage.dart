@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:web/control/content.dart';
@@ -26,8 +25,7 @@ class _MobileDifCommentPageState extends State<MobileDifCommentPage> {
     ContentProvider contentProvider = Provider.of<ContentProvider>(context);
     UserProvider userProvider = Provider.of<UserProvider>(context);
     ContentDataModel contentData = contentProvider.contentDataModelList[contentProvider.contentIndex];
-    double ss = MediaQuery.of(context).size.height;
-    print('height@@ : $ss');
+    double pageHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
       appBar: AppBar(
@@ -42,7 +40,7 @@ class _MobileDifCommentPageState extends State<MobileDifCommentPage> {
           child: Column(
             children: [
               SizedBox(
-                height: ss - 140,
+                height: pageHeight - 140,
                 child: ListView.builder(
                     physics: const ScrollPhysics(),
                     itemCount: contentData.comment.length,
@@ -64,15 +62,15 @@ class _MobileDifCommentPageState extends State<MobileDifCommentPage> {
                       }
                       String commentString = utf8.decode(intList);
                       return Padding(
-                        padding: const EdgeInsets.all(10.0),
+                        padding: const EdgeInsets.all(2.0),
                         child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
                           Expanded(
                             flex: 1,
                             child: Padding(
-                              padding: const EdgeInsets.all(10.0),
+                              padding: const EdgeInsets.all(5.0),
                               child: Container(
-                                  width: 80,
-                                  height: 80,
+                                  width: 50,
+                                  height: 50,
                                   decoration: BoxDecoration(
                                       shape: BoxShape.circle, image: DecorationImage(fit: BoxFit.fill, image: NetworkImage(profileImageUri)))),
                             ),
@@ -83,16 +81,14 @@ class _MobileDifCommentPageState extends State<MobileDifCommentPage> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                      '${commentDataModel.userId}  $commentString',
-                                      overflow: TextOverflow.clip,
-                                      style: const TextStyle(color: Colors.white, fontSize: 15)),
+                                  Text('${commentDataModel.userId}  $commentString',
+                                      overflow: TextOverflow.clip, style: const TextStyle(color: Colors.white, fontSize: 15)),
                                   myIdCheck
                                       ? Text(agoDate, style: const TextStyle(color: Colors.white, fontSize: 15))
                                       : TextButton(
                                           onPressed: () {
-                                            contentProvider.deleteComment(
-                                                contentData.contentId, userProvider.userId, commentDataModel.commentSeq, commentIndex, contentProvider.contentIndex);
+                                            contentProvider.deleteComment(contentData.contentId, userProvider.userId, commentDataModel.commentSeq,
+                                                commentIndex, contentProvider.contentIndex);
                                           },
                                           child: const Text('지우기', style: TextStyle(color: Colors.red, fontSize: 15))),
                                 ],
@@ -119,8 +115,10 @@ class _MobileDifCommentPageState extends State<MobileDifCommentPage> {
                                         if (v != '' && v.isNotEmpty) {
                                           if (userProvider.userId != MyWord.LOGIN) {
                                             contentProvider.setComment(
-                                                contentIndex: contentData.contentId, comment: v,
-                                                userId: userProvider.userId, pageListIndex: contentProvider.contentIndex);
+                                                contentIndex: contentData.contentId,
+                                                comment: v,
+                                                userId: userProvider.userId,
+                                                pageListIndex: contentProvider.contentIndex);
                                             textEditingController.clear();
                                             focusNode.requestFocus();
                                           } else {
@@ -149,8 +147,10 @@ class _MobileDifCommentPageState extends State<MobileDifCommentPage> {
                                 if (textEditingController.text != '' && textEditingController.text.isNotEmpty) {
                                   if (userProvider.userId != MyWord.LOGIN) {
                                     contentProvider.setComment(
-                                        contentIndex: contentData.contentId, comment: textEditingController.text,
-                                        userId: userProvider.userId, pageListIndex: contentProvider.contentIndex);
+                                        contentIndex: contentData.contentId,
+                                        comment: textEditingController.text,
+                                        userId: userProvider.userId,
+                                        pageListIndex: contentProvider.contentIndex);
                                     textEditingController.clear();
                                     focusNode.requestFocus();
                                   } else {

@@ -83,8 +83,7 @@ class _MobileAddImagesPageState extends State<MobileAddImagesPage> {
                       }),
                 );
               } else {
-                return const Center(
-                    child: SizedBox(height: 50, child: Text('길게 누르면 지워집니다.', style: TextStyle(color: Colors.white))));
+                return const Center(child: SizedBox(height: 50, child: Text('길게 누르면 지워집니다.', style: TextStyle(color: Colors.white))));
               }
             }),
             const SizedBox(height: 50),

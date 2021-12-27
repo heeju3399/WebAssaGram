@@ -58,6 +58,7 @@ class ContentProvider extends ChangeNotifier {
       returnBool = true;
       notifyListeners();
     } else {
+      print('provider setcomment err');
       // 뭔가모를 에러
     }
     return returnBool;

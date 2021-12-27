@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:web/control/content.dart';
@@ -17,6 +16,7 @@ class MobileUserCommentPage extends StatefulWidget {
   _MobileUserCommentPageState createState() => _MobileUserCommentPageState();
 }
 
+// ignore_for_file: avoid_print
 class _MobileUserCommentPageState extends State<MobileUserCommentPage> {
   FocusNode focusNode = FocusNode();
   TextEditingController textEditingController = TextEditingController();
@@ -30,10 +30,16 @@ class _MobileUserCommentPageState extends State<MobileUserCommentPage> {
     if (userId == MyWord.LOGIN) {
       MyDialog.setContentDialog(title: '익명으로는 사용할수 없어요', message: '댓글은 로그인후 이용가능합니다', context: context);
     } else {
-      int index = userContentProvider.contentPageIndex;
-      contentProvider.setComment(contentIndex: contentData.contentId, comment: value, userId: userId, pageListIndex: index).then((result2) => {
-            if (result2) {userContentProvider.setComment(index, value, userId)}
-          });
+      int index = userContentProvider.userChooseContentIndex;
+      try{
+        contentProvider.setComment(contentIndex: contentData.contentId, comment: value, userId: userId, pageListIndex: index).then((result2) {
+          if (result2) {
+            userContentProvider.setComment(index, value, userId);
+          }
+        });
+      }catch(e){
+        print('add comment err $e');
+      }
     }
   }
 
@@ -102,15 +108,15 @@ class _MobileUserCommentPageState extends State<MobileUserCommentPage> {
                       profileImageUri = ContentControl.redefineComment(contentProvider, commentDataModel);
 
                       return Padding(
-                        padding: const EdgeInsets.all(10.0),
+                        padding: const EdgeInsets.all(2.0),
                         child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
                           Expanded(
                             flex: 1,
                             child: Padding(
-                              padding: const EdgeInsets.all(10.0),
+                              padding: const EdgeInsets.all(4.0),
                               child: Container(
-                                  width: 80,
-                                  height: 80,
+                                  width: 50,
+                                  height: 50,
                                   decoration: BoxDecoration(
                                       shape: BoxShape.circle, image: DecorationImage(fit: BoxFit.fill, image: NetworkImage(profileImageUri)))),
                             ),

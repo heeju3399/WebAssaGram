@@ -1,12 +1,12 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:provider/provider.dart';
 import 'package:web/control/provider/userprovider.dart';
 import 'package:web/model/myword.dart';
 import 'package:web/page/mobileDash/mibilerankerpage/mobildrankerpage.dart';
-import 'package:web/page/mobileDash/mobileprofilepage/mobildprofilepage.dart';
 import 'package:web/page/mobileDash/mobilehomepage/mobilehomepage.dart';
-
+import 'package:web/page/mobileDash/mobileprofilepage/mobileprofilepage.dart';
 import 'mobilehomepage/mobileloginpage.dart';
 
 class MobileMainDashPage extends StatefulWidget {
@@ -43,7 +43,19 @@ class _MobileMainDashPageState extends State<MobileMainDashPage> with SingleTick
           const MobileHomePage(),
           const MobileRankerPage(),
           if (userProvider.userId != MyWord.LOGIN) const MobileProfilePage(),
-          if (userProvider.userId == MyWord.LOGIN) const MobileSignPage(),
+          if (userProvider.userId == MyWord.LOGIN)
+            Center(
+              child: AlertDialog(
+                title: const Text('로그인 해주세요!'),
+                actions: [
+                  ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).push(MaterialPageRoute(builder: (context) => const MobileSignPage()));
+                      },
+                      child: const Text('로그인')),
+                ],
+              ),
+            ),
         ],
         controller: tabController,
       ),
@@ -54,30 +66,4 @@ class _MobileMainDashPageState extends State<MobileMainDashPage> with SingleTick
       ]),
     );
   }
-
-// @override
-// Widget build(BuildContext context) {
-//   return Scaffold(
-//     appBar: AppBar(
-//       title: Text('ddddd'),
-//     ),
-//     bottomSheet: Padding(
-//       padding: EdgeInsets.all(10),
-//       child: Row(
-//         mainAxisAlignment: MainAxisAlignment.spaceAround,
-//         crossAxisAlignment: CrossAxisAlignment.end,
-//         children: [
-//           InkWell(onTap: () {}, child: Icon(Icons.home, size: 30)),
-//           InkWell(onTap: () {}, child: Icon(Icons.people, size: 30)),
-//           InkWell(onTap: () {}, child: Icon(Icons.favorite, size: 30)),
-//         ],
-//       ),
-//     ),
-//     body: Container(
-//
-//
-//       color: Colors.red,
-//     ),
-//   );
-// }
 }

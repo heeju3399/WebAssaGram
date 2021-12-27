@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:ionicons/ionicons.dart';
 import 'package:provider/provider.dart';
 import 'package:web/control/content.dart';
 import 'package:web/control/provider/usercontentprovider.dart';
 import 'package:web/control/provider/userprovider.dart';
 import 'package:web/model/content.dart';
 import 'package:web/model/myword.dart';
-
 import 'mobiledifprofiledetailpage.dart';
 
 class MobileDifProfilePage extends StatefulWidget {
@@ -36,12 +34,7 @@ class _MobileDifProfilePageState extends State<MobileDifProfilePage> {
 
     return Scaffold(
         backgroundColor: Colors.black,
-        appBar: AppBar(
-          backgroundColor: Colors.black,
-          title: Text(userProvider.difChooseContentUserId, style: const TextStyle(color: Colors.white)),
-          actions: [
-          ],
-        ),
+        appBar: AppBar(backgroundColor: Colors.black, title: Text(userProvider.difChooseContentUserId, style: const TextStyle(color: Colors.white))),
         body: SingleChildScrollView(
           physics: const ScrollPhysics(),
           child: Column(
@@ -113,9 +106,9 @@ class _MobileDifProfilePageState extends State<MobileDifProfilePage> {
                                     ),
                                     Expanded(
                                       flex: 1,
-                                      child: Column(children: [
-                                        Text('4037', style: const TextStyle(color: Colors.white, fontSize: 15)),
-                                        const Text('개발중', style: TextStyle(color: Colors.white, fontSize: 15)),
+                                      child: Column(children: const [
+                                        Text('4037', style: TextStyle(color: Colors.white, fontSize: 15)),
+                                        Text('개발중', style: TextStyle(color: Colors.white, fontSize: 15)),
                                       ]),
                                     ),
                                   ]),
@@ -154,57 +147,18 @@ class _MobileDifProfilePageState extends State<MobileDifProfilePage> {
                           padding: const EdgeInsets.all(2.0),
                           child: InkWell(
                               onTap: () {
-                                print('click detail page $index');
                                 userContentProvider.setPage(index);
                                 userContentProvider.setProfileImageString(profileImage);
-                                ContentControl.navigatorPush(context, const DifProfileDetailPage());
-                                //userContentProvider.setPage(index);
-                                //navigatorPush(context, const ProfileDetailPage());
+                                ContentControl.navigatorPush(context, const MobileDifProfileDetailPage());
                               },
                               child: Container(
                                   decoration: BoxDecoration(
-                                      shape: BoxShape.rectangle, image: DecorationImage(fit: BoxFit.fill, image: NetworkImage(imagesUrlList.last))))));
+                                      shape: BoxShape.rectangle,
+                                      image: DecorationImage(fit: BoxFit.fill, image: NetworkImage(imagesUrlList.last))))));
                     }),
               ),
             ],
           ),
-        )
-
-        // Column(
-        //   children: [
-        //     Expanded(flex: 2, child: Row(
-        //       children: [
-        //         Expanded(flex: 2,child: Container(color: Colors.lightGreen)),
-        //         Expanded(flex: 1,child: Container(color: Colors.white38)),
-        //         Expanded(flex: 1,child: Container(color: Colors.red)),
-        //         Expanded(flex: 1,child: Container(color: Colors.orange)),
-        //       ],
-        //     )),
-        //     Expanded(flex: 1, child: Container(color: Colors.green)),
-        //     Expanded(flex: 6, child: Container(color: Colors.orange, child: GridView.builder(
-        //         shrinkWrap: true,
-        //         itemCount: 100, //item 개수
-        //         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        //           crossAxisCount: 3, //1 개의 행에 보여줄 item 개수
-        //         ),
-        //         itemBuilder: (BuildContext context, int index) {
-        //           // print('grid build pass!! ');
-        //           // XFile imgFile = imagesList.elementAt(index);
-        //           return InkWell(
-        //             onLongPress: () {
-        //               print('pass : $index');
-        //               setState(() {
-        //                // imagesList.removeAt(index);
-        //                // imagesFullCount--;
-        //               });
-        //             },
-        //             child: Padding(padding: const EdgeInsets.all(10.0), child: //Image.network(imgFile.path)
-        //               Container(color: Colors.green,)
-        //             ),
-        //           );
-        //         }),)),
-        //   ],
-        // ),
-        );
+        ));
   }
 }

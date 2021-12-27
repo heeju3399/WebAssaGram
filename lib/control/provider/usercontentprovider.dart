@@ -70,12 +70,13 @@ class UserContentProvider extends ChangeNotifier {
   }
 
   void setProfileImage(String userId, String googleAccessId, XFile image) async {
+
     List resultList = await NodeServer.setProfileImage(userId, googleAccessId, image);
     if (resultList.elementAt(0) == 'true') {
       String profileImgUrl = resultList.elementAt(1).toString();
-      userProfileImageUri = MyWord.serverIpAndPort+'$profileImgUrl';
+      userProfileImageUri = MyWord.serverIpAndPort+profileImgUrl;
       notifyListeners();
-    } else {}
+    }
   }
 
   Future<bool> deleteAllContent(String userId) async {

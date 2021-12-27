@@ -34,6 +34,14 @@ class _ProfileDetailPageState extends State<ProfileDetailPage> {
     timer();
   }
 
+
+  @override
+  void dispose() {
+    textEditCommentController.dispose();
+    myFocusNode.dispose();
+    super.dispose();
+  }
+
   void timer() async {
     await Future.delayed(const Duration(milliseconds: 500));
     setState(() {
@@ -241,7 +249,7 @@ class _ProfileDetailPageState extends State<ProfileDetailPage> {
                                                       flex: 3,
                                                       child: Container(
                                                           width: 50,
-                                                          height: 50,
+                                                          height: 45,
                                                           decoration: BoxDecoration(
                                                               shape: BoxShape.circle,
                                                               image: DecorationImage(fit: BoxFit.fill, image: NetworkImage(profileImage))))),

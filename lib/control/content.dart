@@ -19,7 +19,7 @@ class ContentControl {
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           const begin = Offset(1.0, 0.0);
           final end = Offset.zero;
-          final curve = Curves.ease;
+          const curve = Curves.ease;
           final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
           return SlideTransition(
             position: animation.drive(tween),
@@ -49,7 +49,7 @@ class ContentControl {
   }
 
   static String redefineUserProfileImage(ContentProvider contentProvider, String userId) {
-    String returnProfileString = MyWord.imagesServerIpAndPort + 'basic.png';
+    String returnProfileString = '';
     String imgString = '';
     List profileImageList = contentProvider.profileImageList;
     for (var element in profileImageList) {
@@ -60,7 +60,7 @@ class ContentControl {
         returnProfileString = MyWord.imagesServerIpAndPort + imgString;
         break;
       } else {
-        returnProfileString = MyWord.imagesServerIpAndPort + 'basic.png';
+        returnProfileString = '';
       }
     }
     return returnProfileString;
